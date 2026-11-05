@@ -393,7 +393,7 @@ body.landing #app{background:var(--gradient-main)}
 .gal::-webkit-scrollbar{display:none}
 .gal-slide{flex:0 0 100%;scroll-snap-align:center;display:block;min-width:0}
 .gal-slide img{width:100%;aspect-ratio:var(--ar,16/9);object-fit:cover;display:block;-webkit-user-drag:none}
-.gal-wrap.a{--ar:16/9}.gal-wrap.b{--ar:1/1}.gal-wrap.svc{--ar:16/9}
+.gal-wrap.a{--ar:1/1}.gal-wrap.b{--ar:1/1}.gal-wrap.svc{--ar:1/1}
 .gal-wrap.d{--ar:1/1;border-radius:var(--r-xl);overflow:hidden;margin-bottom:8px}
 .gal-wrap.d{background:#0f172a}.gal-wrap.d .gal-slide img{object-fit:contain;background:#0f172a}
 .gal-count{position:absolute;left:10px;bottom:10px;background:rgba(15,23,42,.65);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:var(--r-full);pointer-events:none}
@@ -492,7 +492,8 @@ body.landing #app{background:var(--gradient-main)}
 .badge-expiry.warn{background:rgba(249,115,22,.14);color:#c2410c;border:1px solid rgba(249,115,22,.32)}
 .badge-expiry.last{background:rgba(234,88,12,.2);color:#9a3412;border:1px solid rgba(194,65,12,.45)}
 .gal-wrap:not(.d) .gal-slide{position:relative;overflow:hidden;background:#0f172a}
-.gal-wrap:not(.d) .gal-slide::before{content:"";position:absolute;inset:-14px;background:var(--bg) center/cover no-repeat;filter:blur(16px) brightness(.85);transform:scale(1.1)}
+.gal-wrap:not(.d) .gal-slide::before{content:"";position:absolute;inset:-14px;background:var(--bg) center/cover no-repeat;filter:blur(9px) brightness(.92) saturate(1.3);transform:scale(1.1)}
+.gal-wrap:not(.d) .gal-slide.cv img{object-fit:cover}
 .gal-wrap:not(.d) .gal-slide img{position:relative;object-fit:contain}
 .pub-img-carousel{object-fit:contain;background:#0f172a}
 .soc-row{display:flex;gap:12px;justify-content:center;margin:8px 0 14px}
@@ -522,6 +523,7 @@ body.landing #app{background:var(--gradient-main)}
 .hp-typing i{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:hpdot 1s infinite ease-in-out}.hp-typing i:nth-child(2){animation-delay:.15s}.hp-typing i:nth-child(3){animation-delay:.3s}
 @keyframes hpdot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .hp-msg p{margin:0 0 10px;background:#f1f5f9;border-radius:16px 16px 16px 4px;padding:10px 12px}.hp-msg b{color:#4c1d95}
+.guide-card{max-height:84vh;overflow:auto}.guide-list details{border:1px solid var(--color-border);border-radius:12px;padding:10px 12px;margin:0 0 8px;background:#fff}.guide-list summary{font-weight:600;font-size:14px;cursor:pointer;color:#1e1b4b}.guide-list details[open]{background:#f8fafc}.guide-list details p{margin:8px 0 2px;font-size:13.5px;line-height:1.5;color:#475569}
 .hp-btns{display:flex;gap:6px;flex-wrap:wrap}
 body[data-route=publicar] #helper,body[data-route=editar] #helper,body[data-route=entrar] #helper,body[data-route=criar-perfil] #helper,body[data-route=editar-perfil] #helper,body[data-route=bem-vindo] #helper{display:none}
 .cloud-box{padding:56px 20px}.cloud-box .empty-t{margin-top:10px}
@@ -702,6 +704,9 @@ function friendlyError(err) {
     "auth/email-already-in-use": "Este email já tem conta. Tenta entrar.",
     "auth/weak-password": "A palavra-passe deve ter pelo menos 6 caracteres.",
     "auth/invalid-email": "O email não é válido.",
+    "auth/requires-recent-login": "Por segurança, sai e entra outra vez na conta e tenta de novo.",
+    "auth/operation-not-allowed": "O Firebase não deixa mudar o email assim. Fala connosco pela Ajuda.",
+    "auth/missing-password": "Escreve a tua palavra-passe actual.",
     "auth/too-many-requests": "Muitas tentativas. Espera um pouco e tenta de novo.",
     "auth/network-request-failed": "Sem internet. Verifica a ligação.",
     "auth/popup-closed-by-user": "Entrada com Google cancelada.",
@@ -833,7 +838,7 @@ const S = {
 //  continua a abrir e mostra um aviso, em vez de ficar em branco)
 let initializeApp, getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
     signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup,
-    sendPasswordResetEmail, getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+    sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, verifyBeforeUpdateEmail, getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
     collection, query, where, orderBy, limit, getDocs, addDoc, serverTimestamp,
     Timestamp, runTransaction, writeBatch, getCountFromServer, increment;
 
@@ -848,7 +853,8 @@ async function loadFirebase() {
   ]);
   ({ initializeApp } = a);
   ({ getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-     signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } = au);
+     signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
+     EmailAuthProvider, reauthenticateWithCredential, verifyBeforeUpdateEmail } = au);
   ({ getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where,
      orderBy, limit, getDocs, addDoc, serverTimestamp, Timestamp, runTransaction,
      writeBatch, getCountFromServer, increment } = fs);
@@ -868,6 +874,13 @@ const apiSignUp = async (email, pw) => { if (!auth) throw noFb(); return createU
 const apiSignIn = async (email, pw) => { if (!auth) throw noFb(); return signInWithEmailAndPassword(auth, email, pw); };
 const apiGoogle = async () => { if (!auth) throw noFb(); return signInWithPopup(auth, new GoogleAuthProvider()); };
 const apiResetPassword = async email => { if (!auth) throw noFb(); return sendPasswordResetEmail(auth, email); };
+/** Mudar o email: confirma com a palavra-passe e envia um link de confirmação para o email NOVO (o email só muda depois de clicar). */
+const apiChangeEmail = async (newEmail, pw) => {
+  if (!auth || !auth.currentUser) throw noFb();
+  const u = auth.currentUser;
+  await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, pw));
+  await verifyBeforeUpdateEmail(u, newEmail);
+};
 const apiSignOut = async () => { if (auth) await signOut(auth); };
 const apiOnAuth = cb => onAuthStateChanged(auth, cb);
 
@@ -1446,6 +1459,14 @@ document.addEventListener("scroll", e => {
   }, 700);
 })();
 
+// Foto que quase enche o quadro (formato parecido) = enche mesmo; as muito altas ou muito largas ficam inteiras com fundo desfocado
+document.addEventListener("load", e => {
+  const im = e.target; if (!im || im.tagName !== "IMG") return;
+  const sl = im.closest && im.closest(".gal-wrap:not(.d) .gal-slide"); if (!sl) return;
+  const r = im.naturalWidth / Math.max(1, im.naturalHeight), b = sl.getBoundingClientRect(), c = b.width / Math.max(1, b.height);
+  if (r && c && Math.max(r / c, c / r) <= 1.28) sl.classList.add("cv");
+}, true);
+
 // ── Ver a foto grande (toca para abrir; toca outra vez para ampliar; desliza para as outras) ──
 let _lb = null;
 function openLightbox(urls, i) {
@@ -1547,6 +1568,28 @@ ACTIONS.help = () => {
   showModal("Precisas de ajuda?", l || mail ? "Esqueceste a conta, não consegues publicar ou tens uma dúvida? Escreve-nos e respondemos o mais depressa possível." : "A ajuda ainda não está disponível. Volta daqui a pouco.", btns);
 };
 
+function showGuide() {
+  closeModal();
+  const Q = [
+    ["O que é o N Deals?", "É a tua loja online. Mostras o que vendes e partilhas um só link. Quem gostar fala contigo directo no WhatsApp. É grátis para começar."],
+    ["Como crio a minha loja?", "Toca em «Criar o meu perfil», escolhe o email e uma palavra-passe, e preenche o nome e o WhatsApp. Demora 2 minutos."],
+    ["Como publico um artigo?", "Dentro da tua conta toca em «Publicar». Põe 1 ou mais fotos do mesmo artigo, o nome, o preço e a descrição. Toca nos botões «i» se tiveres dúvida num campo."],
+    ["Quero vender outro artigo (outro modelo, cor ou preço)", "Faz outra publicação. Cada artigo tem a sua. Assim cada um tem o seu link e o cliente vê logo o que procura."],
+    ["Como partilho o meu link?", "Abre a tua loja ou uma publicação e toca em «Partilhar». Podes enviar no WhatsApp, no estado ou nos grupos."],
+    ["Quanto tempo dura uma publicação?", `Fica visível ${CONFIG.EXPIRY_DAYS} dias. Antes de acabar, tocas em «Renovar» na secção «Minhas» e ela volta a aparecer como nova.`],
+    ["Esqueci a palavra-passe", "Na página de entrada toca em «Esqueci a palavra-passe». Chega-te um email com um link para criares outra."],
+    ["Não encontro resposta", "Toca em «Preciso de ajuda» e fala connosco no WhatsApp."]
+  ];
+  const d = document.createElement("div"); d.className = "mdl"; d.id = "mdl";
+  d.innerHTML = `<div class="mdl-card guide-card" role="dialog" aria-modal="true"><h3>Guia rápido</h3>
+    <div class="guide-list">${Q.map(q => `<details><summary>${esc(q[0])}</summary><p>${esc(q[1])}</p></details>`).join("")}</div>
+    <div class="mdl-btns"></div></div>`;
+  const box = d.querySelector(".mdl-btns"), mk = (t, cls, fn) => { const x = document.createElement("button"); x.type = "button"; x.className = "btn btn-sm " + cls; x.textContent = t; x.addEventListener("click", () => { closeModal(); if (fn) fn(); }); box.appendChild(x); };
+  mk("Preciso de ajuda", "btn-primary", () => ACTIONS.help()); mk("Fechar", "btn-outline");
+  d.addEventListener("click", e => { if (e.target === d) closeModal(); });
+  document.body.appendChild(d);
+}
+
 // Mãozinha guia: aparece uma vez a quem entra pela primeira vez e fica sempre à mão
 (function helperHand() {
   const HAND = `<svg class="hp-svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11.5V4.8a1.8 1.8 0 013.6 0V10m0 0V9.2a1.7 1.7 0 013.4 0V10m0 0a1.7 1.7 0 013.4 0v4.4c0 3.6-2.3 6.6-5.8 6.6h-.9c-2.1 0-3.6-.9-4.7-2.6L4.9 14.2c-.6-1 .6-2.1 1.7-1.5L9 14"/></svg>`;
@@ -1559,6 +1602,7 @@ ACTIONS.help = () => {
         <p>Olá! O ${esc(CONFIG.APP_NAME)} é onde vendedores abrem a sua loja online e partilham <b>um só link</b> com os clientes. Os clientes falam directo no WhatsApp. É grátis para começar.</p>
         <div class="hp-btns"><a class="btn btn-sm btn-primary" href="#/bem-vindo" data-hp="close">Perceber melhor</a>
         <a class="btn btn-sm btn-outline" href="#/entrar?m=signup" data-hp="close" id="hp-signup">Criar a minha loja</a>
+        <button class="btn btn-sm btn-ghost" type="button" data-hp="guide">Guia rápido</button>
         <button class="btn btn-sm btn-ghost" type="button" data-hp="help">Preciso de ajuda</button></div></div></div>
     <button class="hp-hand" id="hp-hand" type="button" data-hp="toggle" aria-label="Ajuda e guia">${HAND}</button>`;
   document.body.appendChild(d);
@@ -1579,6 +1623,7 @@ ACTIONS.help = () => {
     if (k === "toggle") { bub().hidden ? open() : close(); }
     else if (k === "close") close();
     else if (k === "help") { close(); ACTIONS.help(); }
+    else if (k === "guide") { close(); showGuide(); }
   });
   let seen = false; try { seen = !!localStorage.getItem("nlh_helper"); } catch (e) {}
   // a mão aparece e "aponta" primeiro; só depois surge a caixa de mensagem
@@ -2426,9 +2471,36 @@ async function viewProfileForm(editing) {
       ${inp("website", "Website", "https://…", p.website, 'type="url"')}
       <p class="note">O teu email não aparece publicamente. O telefone aparece para os clientes te contactarem.</p>
       <button class="btn btn-primary btn-full" style="padding:14px" type="submit">${editing ? "Guardar" : "Criar o meu perfil"}</button>
-    </form></div>`;
+    </form>
+    ${editing ? `<div class="card pad-card" style="margin-top:14px"><div class="field-label">Conta</div>
+      <p class="soft" style="margin:4px 0 10px">Email da conta: <b>${esc((S.user && S.user.email) || "")}</b></p>
+      <button class="btn btn-outline btn-sm" type="button" data-act="change-email">Mudar o meu email</button></div>` : ""}</div>`;
 }
 
+ACTIONS["change-email"] = () => {
+  closeModal();
+  const hasPw = !!(auth && auth.currentUser && (auth.currentUser.providerData || []).some(x => x.providerId === "password")) || !(auth && auth.currentUser && auth.currentUser.providerData);
+  const d = document.createElement("div"); d.className = "mdl"; d.id = "mdl";
+  d.innerHTML = `<div class="mdl-card" role="dialog" aria-modal="true"><h3>Mudar o meu email</h3>
+    ${hasPw ? `<p>Escreve o email novo e a tua palavra-passe de hoje. Enviamos um link para o email novo: o email só muda depois de tocares nesse link.</p>
+    <form id="ce-form" novalidate><div class="fld"><label class="field-label">Email novo</label><input class="field-input" id="ce-email" type="email" inputmode="email" autocomplete="email" placeholder="novo@exemplo.com"></div>
+    <div class="fld"><label class="field-label">Palavra-passe actual</label><input class="field-input" id="ce-pw" type="password" autocomplete="current-password"></div>
+    <div class="mdl-btns"><button class="btn btn-sm btn-primary" type="submit">Enviar link</button><button class="btn btn-sm btn-outline" type="button" id="ce-x">Cancelar</button></div></form>`
+    : `<p>A tua conta entra com o Google, por isso o email é o da tua conta Google e não se muda aqui.</p><div class="mdl-btns"><button class="btn btn-sm btn-primary" type="button" id="ce-x">Percebi</button></div>`}</div>`;
+  d.addEventListener("click", e => { if (e.target === d || e.target.id === "ce-x") closeModal(); });
+  const f = d.querySelector("#ce-form");
+  if (f) f.addEventListener("submit", async e => {
+    e.preventDefault();
+    const em = d.querySelector("#ce-email").value.trim(), pw = d.querySelector("#ce-pw").value, btn = f.querySelector("[type=submit]");
+    if (!isValidEmail(em)) { toast("Escreve um email novo válido."); return; }
+    if (!pw) { toast("Escreve a tua palavra-passe actual."); return; }
+    if (S.user && em.toLowerCase() === String(S.user.email || "").toLowerCase()) { toast("Esse já é o teu email."); return; }
+    btn.disabled = true;
+    try { await apiChangeEmail(em, pw); closeModal(); showModal("Link enviado", `Enviámos um link para ${em}. Abre esse email e toca no link para confirmar. Só depois o email muda. Depois entra com o email novo.`); }
+    catch (err) { btn.disabled = false; toast(friendlyError(err), 5000); }
+  });
+  document.body.appendChild(d);
+};
 ACTIONS["profile-type"] = el => {
   const sel = $("#pf-category"); if (sel) sel.innerHTML = optionsHtml(catsFor(el.value), "", "Seleccionar categoria…");
   const w = $("#pf-custom"); if (w) w.hidden = true;
@@ -2718,7 +2790,14 @@ const MSG_OFFLINE = `<b>Sem ligação ao servidor.</b> Verifica a internet. <but
   if (!FIREBASE_READY) { setBanner(MSG_PREVIEW); render(); return; }
   render();   // já mostra o cabeçalho e, na 1.ª visita, a página de entrada
 
-  const failed = () => { if (S.fb === "ready") return; S.fb = "failed"; S.authKnown = true; setBanner(MSG_OFFLINE); render(); };
+  const failed = () => {
+    if (S.fb === "ready") return; S.fb = "failed"; S.authKnown = true; setBanner("");
+    _renderTok++;
+    const v = document.getElementById("view");
+    if (v) v.innerHTML = cloudBox("Sem ligação ao servidor", "Verifica os dados ou o Wi-Fi e tenta de novo. Assim que a internet voltar, o site abre sozinho.",
+      `<button class="btn btn-primary" data-act="reload">Tentar de novo</button>`);
+  };
+  window.addEventListener("online", () => { if (S.fb === "failed") location.reload(); });
   const giveUp = setTimeout(failed, 12000);   // se em 12 s nada, avisa
 
   loadFirebase().then(() => {
