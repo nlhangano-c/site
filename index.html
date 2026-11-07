@@ -248,6 +248,7 @@ textarea.field-input{resize:vertical}
 #profiles-strip::-webkit-scrollbar{display:none}
 .story{flex-shrink:0;text-align:center;width:64px}
 .story-ring{display:block;width:60px;height:60px;margin:0 auto 6px;padding:2px;border-radius:50%;background:var(--gradient-main)}
+.story-ring.soon{background:#4c1d95}.story-ring.none{background:#e2e8f0}
 .story-inner{display:block;width:100%;height:100%;background:#fff;border-radius:50%;padding:2px}
 .story-name{display:block;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .story-cat{display:block;font-size:10px;color:var(--color-text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -508,7 +509,7 @@ body.landing #app{background:var(--gradient-main)}
 .mdl-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 #helper{position:fixed;right:14px;bottom:16px;z-index:400;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
 #helper>*{pointer-events:auto}
-.hp-hand{width:52px;height:52px;border-radius:50%;border:0;background:var(--gradient-main);color:#fff;box-shadow:0 10px 24px rgba(99,102,241,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.hp-hand{width:42px;height:42px;border-radius:50%;border:0;background:var(--gradient-main);color:#fff;box-shadow:0 10px 24px rgba(99,102,241,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .hp-hand .hp-svg{transform-origin:50% 90%}
 .hp-hand.point .hp-svg,.hp-hand:active .hp-svg{animation:hppoint 1.1s ease-in-out 3}
 @keyframes hppoint{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-7px) scale(1.08)}60%{transform:translateY(-3px) scale(1.04)}}
@@ -523,9 +524,24 @@ body.landing #app{background:var(--gradient-main)}
 .hp-typing i{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:hpdot 1s infinite ease-in-out}.hp-typing i:nth-child(2){animation-delay:.15s}.hp-typing i:nth-child(3){animation-delay:.3s}
 @keyframes hpdot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .hp-msg p{margin:0 0 10px;background:#f1f5f9;border-radius:16px 16px 16px 4px;padding:10px 12px}.hp-msg b{color:#4c1d95}
+.batch-link{margin:0 0 12px}
+.rem-done{opacity:.55}.rem-chip{font-weight:700}.rem-chip.expiring{color:#c2410c}.rem-chip.expired{color:#9a3412}.rem-chip.nopub{color:#4f46e5}
+.pv-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:2px dashed #a5b4fc;background:#eef2ff;color:#4f46e5;cursor:pointer}.pv-add small{font-size:11px;font-weight:600}
+.bt-list{display:flex;flex-direction:column;gap:12px;margin:6px 0 14px}
+.bt-row{border:1px solid var(--color-border);border-radius:14px;padding:10px;background:#fff}
+.bt-row.bt-bad{border-color:#ea580c;box-shadow:0 0 0 3px rgba(234,88,12,.18)}
+.bt-n{font-size:12px;font-weight:700;color:#6366f1;margin-bottom:6px}
+.bt-main{display:flex;gap:10px;align-items:flex-start}.bt-main>.pv{flex:0 0 84px;width:84px}
+.bt-fields{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}.bt-fields .field-input{padding:9px 10px;font-size:14px}
+.bt-extra{margin-top:8px;grid-template-columns:repeat(5,1fr)}.bt-extra .pv-x{width:20px;height:20px}
+.bt-acts{display:flex;justify-content:space-between;gap:8px;margin-top:8px;flex-wrap:wrap}.bt-left{display:flex;gap:6px;flex-wrap:wrap}
+.bt-det{display:flex;flex-direction:column;gap:6px;margin-top:8px}.bt-det .field-input{padding:9px 10px;font-size:14px}
+.bt-more{margin:4px 0 12px;border:1px solid var(--color-border);border-radius:12px;padding:10px 12px;background:#fff}.bt-more summary{font-weight:600;font-size:14px;cursor:pointer;color:#4338ca}.bt-more[open] summary{margin-bottom:10px}
+.bt-del{color:#b91c1c}
+.bt-wait{display:flex;align-items:center;gap:8px;font-size:13px;color:#64748b}.bt-wait .spinner{width:18px;height:18px;border-width:2px}
 .guide-card{max-height:84vh;overflow:auto}.guide-list details{border:1px solid var(--color-border);border-radius:12px;padding:10px 12px;margin:0 0 8px;background:#fff}.guide-list summary{font-weight:600;font-size:14px;cursor:pointer;color:#1e1b4b}.guide-list details[open]{background:#f8fafc}.guide-list details p{margin:8px 0 2px;font-size:13.5px;line-height:1.5;color:#475569}
 .hp-btns{display:flex;gap:6px;flex-wrap:wrap}
-body[data-route=publicar] #helper,body[data-route=editar] #helper,body[data-route=entrar] #helper,body[data-route=criar-perfil] #helper,body[data-route=editar-perfil] #helper,body[data-route=bem-vindo] #helper{display:none}
+body[data-route=publicar] #helper,body[data-route=publicar-varias] #helper,body[data-route=publicar-um] #helper,body[data-route=editar] #helper,body[data-route=entrar] #helper,body[data-route=criar-perfil] #helper,body[data-route=editar-perfil] #helper,body[data-route=bem-vindo] #helper{display:none}
 .cloud-box{padding:56px 20px}.cloud-box .empty-t{margin-top:10px}
 </style>
 </head>
@@ -1128,7 +1144,7 @@ async function apiAdminStats() {
   ]);
   const total = all.data().count, active = act.data().count;
   const out = { users: u.data().count, total, active, expired: total - active,
-    today: 0, week: 0, publishers: 0, likes: 0, clicks: 0, views: 0, provinces: [], top: [], noPub: [], visitsToday: 0, visitsWeek: 0 };
+    today: 0, week: 0, publishers: 0, likes: 0, clicks: 0, views: 0, provinces: [], top: [], noPub: [], remind: [], visitsToday: 0, visitsWeek: 0 };
   try {                                           // números extra: lê até 1000 perfis e 1000 publicações (só o admin faz isto)
     const [pS, lS] = await Promise.all([
       getDocs(query(collection(db, "profiles"), orderBy("createdAt", "desc"), limit(1000))),
@@ -1145,6 +1161,19 @@ async function apiAdminStats() {
     out.publishers = owners.size;
     out.top = tops.sort((a, b) => (b.clicks * 3 + b.views + b.likes) - (a.clicks * 3 + a.views + a.likes)).slice(0, 5).filter(t => t.clicks + t.views + t.likes > 0);
     out.noPub = pS.docs.filter(d => !owners.has(d.id)).slice(0, 30).map(d => ({ id: d.id, ...d.data() }));
+    // Lembretes: quem termina em breve, quem já ficou sem publicações activas, e quem ainda não publicou
+    const prof = {}; pS.docs.forEach(d => { prof[d.id] = { id: d.id, ...d.data() }; });
+    const by = {}, nowMs = Date.now();
+    lS.docs.forEach(d => { const x = d.data(); (by[x.ownerId] = by[x.ownerId] || []).push({ title: x.title, exp: toMillis(x.expiresAt), st: x.status }); });
+    const expiring = [], expired = [];
+    Object.keys(by).forEach(uid => {
+      const pr = prof[uid]; if (!pr || pr.status === "suspended") return;
+      const act = by[uid].filter(a => a.st === "active" && a.exp > nowMs), soon = act.filter(a => a.exp - nowMs <= 2 * 864e5);
+      if (soon.length) expiring.push({ kind: "expiring", p: pr, days: Math.max(1, Math.ceil((Math.min(...soon.map(a => a.exp)) - nowMs) / 864e5)), titles: soon.map(a => a.title), count: soon.length });
+      else if (!act.length) expired.push({ kind: "expired", p: pr, titles: by[uid].map(a => a.title), count: by[uid].length });
+    });
+    expiring.sort((a, b) => a.days - b.days);
+    out.remind = [...expiring, ...out.noPub.filter(u => u.status !== "suspended").map(u => ({ kind: "nopub", p: u })), ...expired].slice(0, 60);
     try {                                              // visitas por dia (contador próprio do site)
       const vs = await getDocs(collection(db, "stats"));
       const days = vs.docs.map(d => ({ day: d.id, n: (d.data().visits || 0) })).sort((a, b) => b.day.localeCompare(a.day));
@@ -1592,7 +1621,7 @@ function showGuide() {
 
 // Mãozinha guia: aparece uma vez a quem entra pela primeira vez e fica sempre à mão
 (function helperHand() {
-  const HAND = `<svg class="hp-svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11.5V4.8a1.8 1.8 0 013.6 0V10m0 0V9.2a1.7 1.7 0 013.4 0V10m0 0a1.7 1.7 0 013.4 0v4.4c0 3.6-2.3 6.6-5.8 6.6h-.9c-2.1 0-3.6-.9-4.7-2.6L4.9 14.2c-.6-1 .6-2.1 1.7-1.5L9 14"/></svg>`;
+  const HAND = `<svg class="hp-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11.5V4.8a1.8 1.8 0 013.6 0V10m0 0V9.2a1.7 1.7 0 013.4 0V10m0 0a1.7 1.7 0 013.4 0v4.4c0 3.6-2.3 6.6-5.8 6.6h-.9c-2.1 0-3.6-.9-4.7-2.6L4.9 14.2c-.6-1 .6-2.1 1.7-1.5L9 14"/></svg>`;
   const d = document.createElement("div"); d.id = "helper";
   d.innerHTML = `<div class="hp-bubble" id="hp-bubble" hidden>
       <div class="hp-head"><span class="hp-av"><img src="${esc(LOGO_SRC)}" alt=""></span><span class="hp-who"><b>${esc(CONFIG.APP_NAME)}</b><small>a escrever…</small></span>
@@ -1762,7 +1791,7 @@ function startAt(hash) {
 }
 
 // Páginas que precisam de saber QUEM és (esperam pelo login do Firebase)
-const PROTECTED = ["perfil", "publicar", "editar", "minhas", "entrar", "criar-perfil", "editar-perfil", "admin", "avisos"];
+const PROTECTED = ["perfil", "publicar", "publicar-varias", "publicar-um", "editar", "minhas", "entrar", "criar-perfil", "editar-perfil", "admin", "avisos"];
 
 /** Barra de aviso por baixo do cabeçalho (modo pré-visualização / sem ligação). */
 function setBanner(html) {
@@ -1805,7 +1834,9 @@ async function render() {
       case "p": html = await viewProfile(seg[1]); break;
       case "perfil": html = await viewProfile(null); break;
       case "a": html = await viewListing(seg[1]); break;
-      case "publicar": html = await viewListingForm(null, qs.get("kind")); break;
+      case "publicar": html = await viewBatchForm(qs.get("kind")); break;
+      case "publicar-varias": html = await viewBatchForm(qs.get("kind")); break;
+      case "publicar-um": html = await viewListingForm(null, qs.get("kind")); break;
       case "editar": html = await viewListingForm(seg[1]); break;
       case "minhas": html = await viewMine(); break;
       case "entrar": html = await viewAuth(qs.get("m")); break;
@@ -1902,12 +1933,14 @@ async function viewHome() {
     ${expiryBanner(mine)}
 
     <div class="section-head"><h2>Perfis em destaque</h2></div>
-    <div id="profiles-strip">${profiles.length ? profiles.map(p => `
+    <div id="profiles-strip">${profiles.length ? profiles.map(p => {
+      const ds = listings.filter(l => l.ownerId === p.id).map(daysLeft), ring = !ds.length ? "none" : (Math.min(...ds) <= 2 ? "soon" : "");
+      return `
       <a class="story" href="#/p/${esc(p.slug)}">
-        <span class="story-ring"><span class="story-inner">${avatar(p, "avatar-fill")}</span></span>
+        <span class="story-ring ${ring}"><span class="story-inner">${avatar(p, "avatar-fill")}</span></span>
         <span class="story-name">${esc((p.proName || p.name || "").split(" ")[0])}</span>
         <span class="story-cat">${esc(p.category || "")}</span>
-      </a>`).join("") : `<p class="soft center">Ainda sem perfis. Seja o primeiro!</p>`}</div>
+      </a>`; }).join("") : `<p class="soft center">Ainda sem perfis. Seja o primeiro!</p>`}</div>
 
     ${S.introGone ? "" : `<div id="intro-block">
     <div class="stats-grid">
@@ -2406,6 +2439,8 @@ function photoTiles(slot) {
          : PH.existing.photos.map(u => tile(img(u, 200), null)).join("");
   } else if (PH[slot]) html = tile(PH[slot].url, 0);
   else if (PH.existing[slot]) html = tile(img(PH.existing[slot], 200), null);
+  if (slot === "photos" && PHOTOS_READY && PH.photos.length && PH.photos.length < CONFIG.MAX_IMAGES)
+    html += `<label class="pv pv-add" aria-label="Juntar mais fotos">${ic("plus", 26)}<small>Juntar</small><input type="file" accept="image/*" multiple hidden data-onchange="pick-photo" data-slot="photos"></label>`;
   return html + (PH.busy && PH.busySlot === slot ? `<div class="pv pv-wait"><div class="spinner"></div></div>` : "");
 }
 function paintPhotos(slot) {
@@ -2678,6 +2713,166 @@ FORMS.listing = async f => {
 };
 
 
+// ══════════ PUBLICAR (1 ou vários artigos, no mesmo ecrã) ══════════
+// Cada foto é um artigo (nome + preço). Fotos do mesmo artigo juntam-se ao de cima.
+// O resto (categoria, descrição, localização, WhatsApp) já vem do perfil e fica em "Mais detalhes".
+const BT = { items: [], busy: 0, kind: "product", left: 0 };
+function resetBatch() { BT.items.forEach(i => URL.revokeObjectURL(i.url)); BT.items = []; BT.busy = 0; BT.kind = "product"; }
+const btGroups = () => { const g = []; BT.items.forEach((it, i) => { if (it.join && g.length) g[g.length - 1].extra.push(i); else g.push({ lead: i, extra: [] }); }); return g; };
+const btCats = kind => (kind === "service" ? CONFIG.CATEGORIES_SERVICES : CONFIG.CATEGORIES_PRODUCTS).filter(c => c !== "Outro");
+async function viewBatchForm(kindParam) {
+  if (!requireProfile("#/publicar")) return null;
+  const mine = await apiLoadUserListings(S.user.uid), left = CONFIG.MAX_PUBLICATIONS_PER_USER - mine.filter(isActive).length;
+  if (left <= 0) return emptyBox("A tua loja está cheia", "Tens muitas publicações activas. Elimina uma antiga, ou fala connosco para aumentarmos o teu espaço.", `<a class="btn btn-primary btn-sm" href="#/minhas">Ver as minhas</a>`);
+  resetBatch(); BT.left = left;
+  const kind = ["product", "service"].includes(kindParam) ? kindParam : (S.profile.type === "service" ? "service" : "product");
+  BT.kind = kind;
+  const defCat = btCats(kind).includes(S.profile.category) ? S.profile.category : "";
+  return `<div class="container pad narrow">
+    <button class="back" data-act="back">${ic("back", 16)} Voltar</button>
+    <h1 class="h1">Publicar</h1>
+    <p class="soft" style="margin-bottom:12px">Escolhe as fotos (uma ou várias). Cada foto é um artigo: escreve o nome e, se quiseres, o preço. Ainda podes publicar até <b>${left}</b>.</p>
+    <form class="card pad-card" data-form="batch" novalidate>
+      <label class="photo-upload-btn">${ic("image", 22)}<span>Toca para escolher as fotos</span>
+        <input type="file" accept="image/*" multiple hidden data-onchange="bt-pick"></label>
+      <p class="note" style="margin-top:6px">Se o telemóvel só deixar escolher uma de cada vez, toca outra vez e vai juntando.</p>
+      <div id="bt-list" class="bt-list"></div>
+      <details class="bt-more" id="bt-more" ${defCat ? "" : "open"}><summary>Mais detalhes (opcional)</summary>
+        <div class="fld"><div class="type-pick">
+          <label><input type="radio" name="kind" value="product" ${kind === "product" ? "checked" : ""} data-onchange="bt-kind"><span><b>Produtos</b><small>Vender algo</small></span></label>
+          <label><input type="radio" name="kind" value="service" ${kind === "service" ? "checked" : ""} data-onchange="bt-kind"><span><b>Serviços</b><small>Oferecer trabalho</small></span></label>
+        </div></div>
+        <div class="fld"><label class="field-label">Categoria (para todos) ${defCat ? "" : "*"}</label>
+          <select class="field-input" name="category" id="bt-cat">${optionsHtml(btCats(kind), defCat, "Seleccionar…")}</select>
+          <p class="note">Vem do teu perfil. Muda só se estes artigos forem de outra categoria.</p></div>
+        <div class="fld"><label class="field-label">Descrição (igual para todos) <span id="bt-req">${kind === "service" ? "*" : ""}</span></label>
+          <textarea class="field-input" name="description" rows="2" maxlength="1000" placeholder="Ex.: entrega no mesmo dia, pagamento M-Pesa / e-Mola"></textarea></div>
+        <div class="fld"><label class="field-label">Localização</label>
+          <input class="field-input" name="location" maxlength="80" value="${esc([S.profile.city, S.profile.province].filter(Boolean).join(", "))}"></div>
+        <div class="fld"><label class="field-label">WhatsApp de contacto *</label>
+          <div class="phone-box"><span>+${CONFIG.COUNTRY_CODE}</span><input name="whatsapp" type="tel" inputmode="tel" maxlength="15" value="${esc(S.profile.phone || "")}"></div></div>
+      </details>
+      <div class="warn-note">Ficam activos por <b>${CONFIG.EXPIRY_DAYS} dias</b>. Podes renovar quando quiseres.</div>
+      <button id="bt-submit" class="btn btn-primary btn-full" style="padding:14px" type="submit" disabled>Publicar</button>
+    </form></div>`;
+}
+function btCatOptions(sel) { return `<option value="">Categoria de cima</option>` + btCats(BT.kind).map(c => `<option value="${esc(c)}" ${c === sel ? "selected" : ""}>${esc(c)}</option>`).join(""); }
+function paintBatch() {
+  const box = document.getElementById("bt-list"); if (!box) return;
+  const ae = document.activeElement, keep = ae && ae.dataset && ae.dataset.bt ? { f: ae.dataset.bt, i: ae.dataset.i, a: ae.selectionStart } : null;
+  const gs = btGroups(), many = gs.length > 1;
+  box.innerHTML = gs.map((g, n) => {
+    const it = BT.items[g.lead], i = g.lead;
+    const extra = g.extra.map(k => `<div class="pv"><img src="${esc(BT.items[k].url)}" alt=""><button type="button" class="pv-x" data-act="bt-split" data-i="${k}" aria-label="Separar esta foto" title="Separar">${ic("refresh", 12)}</button></div>`).join("");
+    return `<div class="bt-row" data-row="${i}">${many ? `<div class="bt-n">Artigo ${n + 1}</div>` : ""}
+      <div class="bt-main"><div class="pv"><img src="${esc(it.url)}" alt=""></div>
+        <div class="bt-fields">
+          <input class="field-input" data-bt="title" data-i="${i}" data-oninput="bt-edit" maxlength="80" placeholder="Nome do artigo *" value="${esc(it.title)}">
+          <input class="field-input" data-bt="price" data-i="${i}" data-oninput="bt-edit" type="number" inputmode="numeric" min="0" max="1000000000" placeholder="Preço em ${CONFIG.CURRENCY} (opcional)" value="${esc(it.price)}"></div></div>
+      ${it.open ? `<div class="bt-det"><textarea class="field-input" data-bt="desc" data-i="${i}" data-oninput="bt-edit" rows="2" maxlength="1000" placeholder="Descrição só deste artigo (opcional)">${esc(it.desc)}</textarea>
+        <select class="field-input" data-bt="cat" data-i="${i}" data-onchange="bt-edit">${btCatOptions(it.cat)}</select></div>` : ""}
+      ${extra ? `<div class="pv-grid bt-extra">${extra}</div>` : ""}
+      <div class="bt-acts"><span class="bt-left"><button type="button" class="btn btn-ghost btn-sm" data-act="bt-more" data-i="${i}">${it.open ? "Menos detalhes" : "+ Detalhes"}</button>
+        ${n > 0 ? `<button type="button" class="btn btn-ghost btn-sm" data-act="bt-join" data-i="${i}">Mesmo artigo que o de cima</button>` : ""}</span>
+        <button type="button" class="btn btn-ghost btn-sm bt-del" data-act="bt-rm" data-i="${i}">${ic("trash", 14)} Tirar</button></div></div>`;
+  }).join("") + (BT.busy ? `<div class="bt-wait"><div class="spinner"></div> A preparar fotos…</div>` : "");
+  const b = document.getElementById("bt-submit");
+  if (b) { b.disabled = !gs.length; b.textContent = gs.length > 1 ? `Publicar ${gs.length} artigos` : "Publicar"; }
+  if (keep) { const e = box.querySelector(`[data-bt="${keep.f}"][data-i="${keep.i}"]`); if (e) { e.focus(); try { e.setSelectionRange(keep.a, keep.a); } catch (x) {} } }
+}
+ACTIONS["bt-kind"] = el => {
+  BT.kind = el.value === "service" ? "service" : "product";
+  const sel = $("#bt-cat"); if (sel) sel.innerHTML = optionsHtml(btCats(BT.kind), btCats(BT.kind).includes(S.profile.category) ? S.profile.category : "", "Seleccionar…");
+  BT.items.forEach(i => { i.cat = ""; });
+  const r = $("#bt-req"); if (r) r.textContent = BT.kind === "service" ? "*" : "";
+  paintBatch();
+};
+ACTIONS["bt-edit"] = el => { const it = BT.items[Number(el.dataset.i)]; if (it) it[el.dataset.bt] = el.value; };
+ACTIONS["bt-more"] = el => { const it = BT.items[Number(el.dataset.i)]; if (it) { it.open = !it.open; paintBatch(); } };
+ACTIONS["bt-pick"] = async el => {
+  const files = Array.from(el.files || []); el.value = "";
+  if (!files.length) return;
+  const room = CONFIG.MAX_PUBLICATIONS_PER_USER * 2 - BT.items.length;
+  if (room <= 0) { toast("Já tens muitas fotos aqui. Publica estas primeiro."); return; }
+  if (files.length > room) toast("Juntei as primeiras fotos. As restantes ficam para a próxima vez.", 4500);
+  for (const f of files.slice(0, room)) {
+    BT.busy++; paintBatch();
+    try { const blob = await compressImage(f); BT.items.push({ blob, url: URL.createObjectURL(blob), title: "", price: "", cat: "", desc: "", open: false, join: false }); }
+    catch (e) { toast(friendlyError(e), 5000); }
+    BT.busy--; paintBatch();
+  }
+};
+ACTIONS["bt-join"] = el => {
+  const i = Number(el.dataset.i), gs = btGroups(), n = gs.findIndex(g => g.lead === i);
+  if (n < 1) return;
+  if (1 + gs[n].extra.length + 1 + gs[n - 1].extra.length > CONFIG.MAX_IMAGES) { toast(`Um artigo pode ter até ${CONFIG.MAX_IMAGES} fotos.`); return; }
+  BT.items[i].join = true; paintBatch();
+};
+ACTIONS["bt-split"] = el => { const it = BT.items[Number(el.dataset.i)]; if (it) { it.join = false; paintBatch(); } };
+ACTIONS["bt-rm"] = el => {
+  const i = Number(el.dataset.i), g = btGroups().find(x => x.lead === i), n = g ? 1 + g.extra.length : 1;
+  if (n > 1 && !confirm(`Tirar este artigo e as suas ${n} fotos?`)) return;
+  BT.items.splice(i, n).forEach(x => URL.revokeObjectURL(x.url));
+  if (BT.items.length && BT.items[0].join) BT.items[0].join = false;
+  paintBatch();
+};
+
+FORMS.batch = async f => {
+  if (!requireProfile()) return;
+  const fd = new FormData(f), kind = val(fd, "kind") === "service" ? "service" : "product";
+  const defCat = val(fd, "category"), shared = val(fd, "description"), whatsapp = normalizeMozPhone(val(fd, "whatsapp"));
+  await waitBatch();
+  const gs = btGroups();
+  if (!gs.length) throw { userMessage: "Escolhe pelo menos uma foto." };
+  const openMore = () => { const d = document.getElementById("bt-more"); if (d) { d.open = true; d.scrollIntoView({ block: "center", behavior: "smooth" }); } };
+  if (!whatsapp) { openMore(); throw { userMessage: "WhatsApp inválido. Usa 9 dígitos (ex.: 84 123 4567)." }; }
+  const bad = (n, msg, i) => { const r = document.querySelector(`[data-row="${i}"]`); if (r) { r.classList.add("bt-bad"); r.scrollIntoView({ block: "center", behavior: "smooth" }); } throw { userMessage: gs.length > 1 ? `Artigo ${n + 1}: ${msg}` : msg[0].toUpperCase() + msg.slice(1) }; };
+  document.querySelectorAll(".bt-bad").forEach(r => r.classList.remove("bt-bad"));
+  gs.forEach((g, n) => {
+    const it = BT.items[g.lead];
+    if (String(it.title).trim().length < 3) bad(n, "escreve o nome (mínimo 3 letras).", g.lead);
+    if (it.price !== "") { const pr = Number(it.price); if (!isFinite(pr) || pr < 0 || pr > 1e9) bad(n, "preço inválido.", g.lead); }
+    if (!(it.cat || defCat)) { openMore(); throw { userMessage: "Escolhe a categoria em «Mais detalhes»." }; }
+    if (kind === "service" && String(it.desc || shared).trim().length < 10) { openMore(); throw { userMessage: "Para serviços, escreve uma breve descrição (mínimo 10 letras) em «Mais detalhes»." }; }
+  });
+  const mine = await apiLoadUserListings(S.user.uid), left = CONFIG.MAX_PUBLICATIONS_PER_USER - mine.filter(isActive).length;
+  if (gs.length > left) throw { userMessage: `Só podes publicar mais ${Math.max(0, left)} artigos agora. Tira alguns daqui ou elimina publicações antigas.` };
+
+  const total = gs.length, published = [], ids = [];
+  try {
+    for (let n = 0; n < gs.length; n++) {
+      const g = gs[n], idx = [g.lead, ...g.extra], it = BT.items[g.lead];
+      toast(total > 1 ? `A publicar ${n + 1} de ${total}…` : "A publicar…", 30000);
+      const images = new Array(idx.length), todo = idx.map((_, k) => k);
+      await Promise.all(Array.from({ length: Math.min(3, idx.length) }, async () => {
+        while (todo.length) { const k = todo.shift(); images[k] = await apiUploadBlob(BT.items[idx[k]].blob); }
+      }));
+      const id = await apiCreateListing({ title: String(it.title).trim(), category: it.cat || defCat, categoryCustom: "", price: it.price === "" ? null : Number(it.price),
+        description: String(it.desc || "").trim() || shared, location: val(fd, "location"), whatsapp, province: S.profile.province || "", kind, images });
+      ids.push(id); published.push(...idx);
+    }
+  } catch (e) {
+    // tira da lista o que já foi publicado; o resto fica para tentar outra vez
+    published.sort((a, b) => b - a).forEach(k => { URL.revokeObjectURL(BT.items[k].url); BT.items.splice(k, 1); });
+    if (BT.items.length && BT.items[0].join) BT.items[0].join = false;
+    paintBatch();
+    throw { userMessage: ids.length ? `Publiquei ${ids.length} de ${total}. ${friendlyError(e)} O resto ficou aqui: toca em Publicar para tentar outra vez.` : friendlyError(e) };
+  }
+  resetBatch(); S.cache.listings = null;
+  if (ids.length === 1) {
+    toast(`Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + ids[0]);
+    setTimeout(() => showModal("Publicado!", "Queres vender mais alguma coisa? Cada artigo (outro modelo, outra cor, outro preço) leva a sua própria publicação.",
+      [{ label: "Outro artigo", primary: true, fn: () => go("#/publicar?kind=" + kind) }, { label: "Ver esta publicação" }]), 700);
+  } else {
+    go("#/minhas");
+    setTimeout(() => showModal(`${ids.length} artigos publicados!`, "Já estão visíveis na tua loja. Se quiseres mudar algum preço ou nome, toca no lápis.", [{ label: "Percebi", primary: true }]), 600);
+  }
+};
+async function waitBatch() {
+  const t0 = Date.now();
+  while (BT.busy > 0) { if (Date.now() - t0 > 60000) throw { userMessage: "As fotos ainda estão a ser preparadas. Espera um momento." }; await new Promise(r => setTimeout(r, 150)); }
+}
+
 /* ################ ZONA 8 — 07-admin.js ################ */
 /**
  * 07-admin.js — Painel de administração
@@ -2686,6 +2881,46 @@ FORMS.listing = async f => {
  * suspender ou apagar o que é dos outros).
  * Para te tornares admin: ver GUIA, passo "Criar o administrador".
  */
+
+// ── Lembretes: o painel já diz quem avisar hoje e deixa a mensagem pronta no WhatsApp ──
+const remDay = () => { const d = new Date(); return `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}`; };
+const remKey = r => `nlh_rem_${r.p.id}_${r.kind}_${remDay()}`;
+const remDone = r => { try { return !!localStorage.getItem(remKey(r)); } catch (e) { return false; } };
+function remindMsg(r) {
+  const first = String(r.p.proName || r.p.name || "").split(" ")[0], site = CONFIG.SITE_URL || "";
+  if (r.kind === "expiring") {
+    const quando = r.days <= 1 ? "amanhã" : "daqui a 2 dias", t = r.count === 1 ? `a tua publicação "${r.titles[0]}"` : `${r.count} das tuas publicações`;
+    return `Olá ${first}! ${t[0].toUpperCase() + t.slice(1)} no ${CONFIG.APP_NAME} termina ${quando}. Para continuares visível, abre o site, vai a "Minhas publicações" e toca em Renovar (é só um toque). Se tiveres artigos novos, já podes publicar vários de uma vez. ${site}`;
+  }
+  if (r.kind === "expired") return `Olá ${first}! As tuas publicações no ${CONFIG.APP_NAME} já terminaram e deixaram de aparecer. Podes renovar com um toque em "Minhas publicações", ou publicar artigos novos. ${site}`;
+  return `Olá ${first}! Vi que criaste a tua loja no ${CONFIG.APP_NAME} mas ainda não publicaste nenhum artigo. Queres ajuda para publicar o primeiro? Agora podes pôr vários de uma vez, cada foto com o seu preço. ${site}`;
+}
+const REM_LABEL = { expiring: r => r.days <= 1 ? "Termina amanhã" : "Termina em 2 dias", expired: () => "Já terminou", nopub: () => "Ainda não publicou" };
+function remindSection(list) {
+  const todo = list.filter(r => !remDone(r)).length;
+  return `<div class="section-head"><h2 id="rem-h">Lembretes para enviar (${todo} por avisar)</h2></div>
+    <button class="btn btn-wa btn-full" style="margin-bottom:10px" data-act="rem-next" ${todo ? "" : "disabled"}>${WA_SVG} Avisar o próximo</button>
+    <div id="rem-list">${list.map(r => {
+      const w = waLink(r.p.phone, remindMsg(r)), done = remDone(r);
+      return `<div class="admin-list-item ${done ? "rem-done" : ""}"><a class="grow" href="#/p/${esc(r.p.slug)}"><div class="li-t">${esc(r.p.proName || r.p.name)}</div><div class="li-s"><b class="rem-chip ${r.kind}">${esc(REM_LABEL[r.kind](r))}</b> · ${esc(r.p.province || "")}</div></a>${w ? `<a class="btn btn-wa btn-sm" data-rem="${esc(remKey(r))}" href="${esc(w)}" target="_blank" rel="noopener noreferrer">${done ? "Avisado" : WA_SVG + " Escrever"}</a>` : ""}</div>`; }).join("")}</div>`;
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest && e.target.closest("a[data-rem]"); if (!a) return;
+  try { localStorage.setItem(a.dataset.rem, "1"); } catch (x) {}
+  const row = a.closest(".admin-list-item"); if (row) row.classList.add("rem-done");
+  a.textContent = "Avisado";
+});
+ACTIONS["rem-next"] = () => {
+  const list = [...document.querySelectorAll("#rem-list a[data-rem]")].find(x => !x.closest(".rem-done"));
+  if (!list) { toast("Já avisaste todos por hoje."); return; }
+  try { localStorage.setItem(list.dataset.rem, "1"); } catch (x) {}
+  const row = list.closest(".admin-list-item"); if (row) row.classList.add("rem-done");
+  window.open(list.href, "_blank", "noopener");
+  list.textContent = "Avisado";
+  const left = document.querySelectorAll("#rem-list .admin-list-item:not(.rem-done)").length, h = document.getElementById("rem-h");
+  if (h) h.textContent = `Lembretes para enviar (${left} por avisar)`;
+  const b = document.querySelector("[data-act=rem-next]"); if (b && !left) b.disabled = true;
+};
 
 async function viewAdmin() {
   if (!S.isAdmin) return emptyBox("Acesso reservado", "Esta área é só para administradores.", `<a class="btn btn-primary btn-sm" href="#/">Ir para o início</a>`);
@@ -2698,11 +2933,10 @@ async function viewAdmin() {
       ${box(st.total, "Publicações")}${box(st.active, "Activas")}${box(st.expired, "Expiradas")}${box(st.likes, "Gostos")}${box(st.clicks, "Cliques no WhatsApp")}${box(st.views, "Visualizações")}${box(st.visitsToday, "Visitas hoje")}${box(st.visitsWeek, "Visitas (7 dias)")}</div>
     ${st.users ? `<p class="soft" style="margin:6px 0 4px;font-size:12px">${Math.round(st.publishers / st.users * 100)}% dos inscritos já publicaram.</p>` : ""}
     ${st.provinces.length ? `<p class="soft" style="margin:0 0 12px;font-size:12px">Por província: ${st.provinces.map(([k, n]) => esc(k) + " " + n).join(" · ")}</p>` : ""}
-    ${st.noPub.length ? `<div class="section-head"><h2>Inscritos que ainda não publicaram (${st.noPub.length})</h2></div>${st.noPub.map(u => {
-      const w = waLink(u.phone, `Olá ${(u.name || "").split(" ")[0]}! Vi que criaste a tua loja no ${CONFIG.APP_NAME} mas ainda não publicaste nenhum artigo. Queres ajuda para publicar o primeiro?`);
-      return `<div class="admin-list-item"><a class="grow" href="#/p/${esc(u.slug)}"><div class="li-t">${esc(u.proName || u.name)}</div><div class="li-s">${esc(u.province || "")} · ${esc(timeAgo(u.createdAt))}</div></a>${w ? `<a class="btn btn-wa btn-sm" href="${esc(w)}" target="_blank" rel="noopener noreferrer">${WA_SVG} Escrever</a>` : ""}</div>`; }).join("")}` : ""}
+    ${st.remind.length ? remindSection(st.remind) : ""}
     ${st.top.length ? `<div class="section-head"><h2>Publicações com mais movimento</h2></div>${st.top.map(t => `<a class="admin-list-item" href="#/a/${esc(t.id)}"><div><div class="li-t">${esc(t.title)}</div><div class="li-s">${esc(t.owner || "")} · WhatsApp ${t.clicks} · ${ic("eye", 12)} ${t.views} · ${ic("heart", 12)} ${t.likes}</div></div>${ic("chevron", 16)}</a>`).join("")}` : ""}
     <div class="col-gap" style="margin-top:14px">
+      ${btn("admin-notes", "edit", "Notas e mensagens", "As tuas mensagens prontas a copiar")}
       ${btn("admin-users", "user", "Listar utilizadores", "Ver perfis e suspender")}
       ${btn("admin-listings", "list", "Listar publicações", "Suspender ou eliminar")}
       ${btn("admin-purge", "trash", "Eliminar expiradas", "Limpar já (o Firebase também limpa sozinho)")}
@@ -2712,6 +2946,35 @@ async function viewAdmin() {
 }
 
 const adminOut = html => { const o = $("#admin-out"); if (o) o.innerHTML = html; };
+
+// ── Notas e mensagens: textos prontos a copiar (ficam guardados neste telemóvel) ──
+const NOTES_DEFAULT = [
+  ["1.ª mensagem (convite)", "Olá! Gostei muito do seu catálogo de [produto]. Para não ter de mandar fotos e preços um a um, convido-o(a) a pôr os seus produtos no N Deals: é grátis e fica tudo num só link. Posso criar-lhe um exemplo para ver como fica?"],
+  ["Se ela disser sim", "Combinado! Mande-me 4 ou 5 fotos dos seus produtos com os preços e eu monto-lhe o exemplo. Se não gostar, apago tudo. Se gostar, fica seu e só ajusta os dados. Se preferir ver primeiro como é, mando-lhe o link de uma loja que já está feita."],
+  ["Se ela quiser ver antes", "Claro! Veja como fica uma loja já feita: [link]. A sua ficaria assim, com os seus produtos. Quer que lhe monte um exemplo?"],
+  ["Seguimento (sem resposta)", "Olá! Passou por aí? Fico à disposição para lhe mostrar como fica, sem compromisso."],
+  ["Regras do contacto", "Mensagens curtas e personalizadas. Perguntar antes de mandar o link. Poucos contactos por dia. Nunca a mesma mensagem copiada em massa. Se não responder, um único lembrete no dia seguinte."],
+  ["Cloudflare Worker", "Endereço: https://fancy-bar-4909.rdrgsmnjt.workers.dev\nVer a imagem de uma publicação: /a/CÓDIGO?debug=1\nSe o cartão não atualizar no WhatsApp, acrescentar ?v=3 ao link.\nCódigo: o ficheiro worker.js (Editar código, apagar tudo, colar, Implementar)."]
+];
+const notesLoad = () => { try { const n = JSON.parse(localStorage.getItem("nlh_notes") || "null"); if (Array.isArray(n)) return n; } catch (e) {} return NOTES_DEFAULT.map(x => ({ t: x[0], b: x[1].replace(/\\n/g, "\n") })); };
+const notesSave = n => { try { localStorage.setItem("nlh_notes", JSON.stringify(n)); } catch (e) {} };
+function notesPaint() {
+  const n = notesLoad();
+  adminOut(`<h2 class="h2">Notas e mensagens</h2><p class="note">Ficam guardadas neste telemóvel. Toca em Copiar e cola no WhatsApp.</p>
+    ${n.map((x, i) => `<div class="card pad-card note-card"><input class="field-input note-t" data-i="${i}" data-oninput="note-edit" data-f="t" value="${esc(x.t)}" maxlength="60">
+      <textarea class="field-input" rows="4" data-i="${i}" data-oninput="note-edit" data-f="b">${esc(x.b)}</textarea>
+      <div class="bt-acts"><button class="btn btn-wa btn-sm" data-act="note-copy" data-i="${i}">Copiar</button><button class="btn btn-ghost btn-sm bt-del" data-act="note-del" data-i="${i}">${ic("trash", 14)} Apagar</button></div></div>`).join("")}
+    <button class="btn btn-outline btn-sm" data-act="note-add">+ Nova nota</button>`);
+}
+ACTIONS["admin-notes"] = () => notesPaint();
+ACTIONS["note-edit"] = el => { const n = notesLoad(), x = n[Number(el.dataset.i)]; if (x) { x[el.dataset.f] = el.value; notesSave(n); } };
+ACTIONS["note-add"] = () => { const n = notesLoad(); n.push({ t: "Nova nota", b: "" }); notesSave(n); notesPaint(); };
+ACTIONS["note-del"] = el => { if (!confirm("Apagar esta nota?")) return; const n = notesLoad(); n.splice(Number(el.dataset.i), 1); notesSave(n); notesPaint(); };
+ACTIONS["note-copy"] = async el => {
+  const x = notesLoad()[Number(el.dataset.i)]; if (!x) return;
+  try { await navigator.clipboard.writeText(x.b); toast("Copiado."); }
+  catch (e) { const t = document.createElement("textarea"); t.value = x.b; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); toast("Copiado."); } catch (z) { toast("Não consegui copiar. Seleciona o texto e copia."); } t.remove(); }
+};
 
 ACTIONS["admin-users"] = async () => {
   adminOut(SPINNER);
