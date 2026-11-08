@@ -241,6 +241,7 @@ textarea.field-input{resize:vertical}
 .hero h1#hero-rot.out{opacity:0;transform:translateY(8px)}
 .hero h1 .nmark{color:#fde68a}
 .hero p{font-size:13px;color:rgba(255,255,255,.88);margin-bottom:18px;position:relative}
+.tx-l{display:block;margin:14px 0 4px;font-size:12px}.tx-group textarea{width:100%;display:block}.tx-group .btn{margin-top:6px}
 .landing-note{display:block;margin-top:10px;font-size:12px;color:rgba(255,255,255,.88);position:relative}
 .welcome-safe{margin:-8px 0 20px;font-size:13px;font-weight:700;opacity:.95}
 .landing-cta{background:#fff;color:var(--color-primary);font-weight:700;font-size:14px;padding:13px 24px;border-radius:var(--r-xl);box-shadow:0 8px 24px rgba(0,0,0,.15);display:inline-block;position:relative}
@@ -1132,6 +1133,11 @@ async function apiTrackVisit(day) {
 }
 
 // ══════════ ADMIN ══════════
+async function apiLoadTexts() {
+  const s = await getDoc(doc(db, "config", "texts"));
+  return s.exists() ? s.data() : null;
+}
+async function apiSaveTexts(obj) { await setDoc(doc(db, "config", "texts"), obj); }
 async function apiIsAdmin(uid) {
   try { return (await getDoc(doc(db, "admins", uid))).exists(); }
   catch (e) { return false; }
@@ -1599,15 +1605,63 @@ ACTIONS.help = () => {
   showModal("Precisas de ajuda?", l || mail ? "Esqueceste a conta, não consegues publicar ou tens uma dúvida? Escreve-nos e respondemos o mais depressa possível." : "A ajuda ainda não está disponível. Volta daqui a pouco.", btns);
 };
 
+
+// ══════════ TEXTOS DO SITE (editáveis no painel «Textos do site») ══════════
+// [chave, grupo, nome no painel, texto original, linhas da caixa]
+const TX_DEFS = [
+  ["hero1_t", "Início (faixa roxa)", "Título 1", "Põe tudo num só link.", 2],
+  ["hero1_s", "Início (faixa roxa)", "Subtítulo 1", "Continuas no teu WhatsApp. Aqui fica tudo arrumado.", 2],
+  ["hero2_t", "Início (faixa roxa)", "Título 2", "As bancas deste mercado estão a abrir. Abre a tua!", 2],
+  ["hero2_s", "Início (faixa roxa)", "Subtítulo 2", "Quem entra agora faz parte da construção deste mercado.", 2],
+  ["hero3_t", "Início (faixa roxa)", "Título 3", "O teu estado desaparece. A tua banca não.", 2],
+  ["hero3_s", "Início (faixa roxa)", "Subtítulo 3", "Fotos e preços sempre à mão, num só endereço. É grátis.", 2],
+  ["hero4_t", "Início (faixa roxa)", "Título 4", "Vê quantos olharam para os teus produtos.", 2],
+  ["hero4_s", "Início (faixa roxa)", "Subtítulo 4", "Gostos, visualizações e toques no WhatsApp, tudo na tua banca.", 2],
+  ["cta_signup", "Início (faixa roxa)", "Botão de criar conta", "Criar a minha banca", 1],
+  ["cta_note", "Início (faixa roxa)", "Por baixo do botão", "Grátis · 2 minutos", 1],
+  ["hand_msg", "Mão guia (balão)", "Frase do balão (*assim* = negrito)", "Vendes alguma coisa? *Põe tudo num só link.* Sem largar o teu WhatsApp.", 3],
+  ["hand_more", "Mão guia (balão)", "Botão 1", "Ver como funciona", 1],
+  ["hand_signup", "Mão guia (balão)", "Botão 2", "Criar a minha banca", 1],
+  ["tagline", "Boas-vindas", "Frase por baixo do nome", CONFIG.TAGLINE, 1],
+  ["w1_t", "Boas-vindas", "Passo 1: título", "Põe a foto", 1],
+  ["w1_s", "Boas-vindas", "Passo 1: frase", "Do teu produto.", 1],
+  ["w2_t", "Boas-vindas", "Passo 2: título", "Põe o preço", 1],
+  ["w2_s", "Boas-vindas", "Passo 2: frase", "E o nome.", 1],
+  ["w3_t", "Boas-vindas", "Passo 3: título", "Partilha o link", 1],
+  ["w3_s", "Boas-vindas", "Passo 3: frase", "No estado, no Facebook, onde quiseres.", 1],
+  ["w_safe", "Boas-vindas", "Frase de segurança", "Não substitui o teu WhatsApp. Só arruma.", 1],
+  ["signup_btn", "Criar conta", "Título e botão", "Criar a minha banca", 1],
+  ["signup_sub", "Criar conta", "Frase de cima", "Preenche e ganhas um link só teu. É só partilhar.", 2],
+  ["pub_t", "Depois de publicar", "Título (1 produto)", "Produto na banca", 1],
+  ["pub_b", "Depois de publicar", "Frase (1 produto)", "Partilha o teu link nos teus estados.", 2],
+  ["pubn_t", "Depois de publicar", "Título (vários; {n} = quantos)", "{n} produtos na banca", 1],
+  ["pubn_b", "Depois de publicar", "Frase (vários)", "Partilha o teu link nos teus estados.", 2],
+  ["share_msg", "Partilha", "Mensagem ao enviar o link no WhatsApp ({link})", "Olha a minha banca no N Deals: {link}", 2],
+  ["faq1_q", "Ajuda", "Pergunta 1", "Para que serve?", 1],
+  ["faq1_a", "Ajuda", "Resposta 1", "Para arrumares os teus produtos num link. Os clientes falam contigo no WhatsApp, como sempre.", 3],
+  ["faq2_q", "Ajuda", "Pergunta 2", "Isto substitui o meu WhatsApp?", 1],
+  ["faq2_a", "Ajuda", "Resposta 2", "Não. Continuas a usar o teu. Aqui só arrumas os produtos.", 3],
+  ["faq3_q", "Ajuda", "Pergunta 3", "Como crio a minha banca?", 1],
+  ["faq3_a", "Ajuda", "Resposta 3", "Toca em «Criar a minha banca». Põe o email, uma palavra-passe, o teu nome e o WhatsApp. São 2 minutos.", 3],
+  ["faq4_q", "Ajuda", "Pergunta 4", "Como partilho o meu link?", 1],
+  ["faq4_a", "Ajuda", "Resposta 4", "Toca em «Partilhar» na tua banca ou num produto. Envia no WhatsApp, no estado ou nos grupos.", 3]
+];
+const TX_DEF = Object.fromEntries(TX_DEFS.map(x => [x[0], x[3]]));
+let TX = (() => { try { const o = JSON.parse(localStorage.getItem("nlh_tx") || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; } })();
+/** O texto de uma chave: o que o administrador guardou, ou o original. */
+const tx = k => { const v = TX[k]; return typeof v === "string" && v.trim() ? v : (TX_DEF[k] || ""); };
+/** Texto seguro; *palavra* vira negrito. */
+const fmt = t => esc(t).replace(/\*([^*\n]+)\*/g, "<b>$1</b>");
+
 function showGuide() {
   closeModal();
   const Q = [
-    ["Para que serve?", "Para arrumares os teus produtos num link. Os clientes falam contigo no WhatsApp, como sempre."],
-    ["Isto substitui o meu WhatsApp?", "Não. Continuas a usar o teu. Aqui só arrumas os produtos."],
-    ["Como crio a minha banca?", "Toca em «Criar a minha banca». Põe o email, uma palavra-passe, o teu nome e o WhatsApp. São 2 minutos."],
+    [tx("faq1_q"), tx("faq1_a")],
+    [tx("faq2_q"), tx("faq2_a")],
+    [tx("faq3_q"), tx("faq3_a")],
     ["Como publico um artigo?", "Dentro da tua conta toca em «Publicar». Põe 1 ou mais fotos do mesmo artigo, o nome, o preço e a descrição. Toca nos botões «i» se tiveres dúvida num campo."],
     ["Quero vender outro artigo (outro modelo, cor ou preço)", "Faz outra publicação. Cada artigo tem a sua. Assim cada um tem o seu link e o cliente vê logo o que procura."],
-    ["Como partilho o meu link?", "Toca em «Partilhar» na tua banca ou num produto. Envia no WhatsApp, no estado ou nos grupos."],
+    [tx("faq4_q"), tx("faq4_a")],
     ["Quanto tempo dura uma publicação?", `Fica visível ${CONFIG.EXPIRY_DAYS} dias. Antes de acabar, tocas em «Renovar» na secção «Minhas» e ela volta a aparecer como nova.`],
     ["Esqueci a palavra-passe", "Na página de entrada toca em «Esqueci a palavra-passe». Chega-te um email com um link para criares outra."],
     ["Não encontro resposta", "Toca em «Preciso de ajuda» e fala connosco no WhatsApp."]
@@ -1631,13 +1685,14 @@ function showGuide() {
         <button class="hp-x" type="button" data-hp="close" aria-label="Fechar">${ic("close", 16)}</button></div>
       <div class="hp-typing" id="hp-typing"><i></i><i></i><i></i></div>
       <div class="hp-msg" id="hp-msg" hidden>
-        <p>Vendes alguma coisa? <b>Põe tudo num só link.</b> Sem largar o teu WhatsApp.</p>
-        <div class="hp-btns"><a class="btn btn-sm btn-primary" href="#/bem-vindo" data-hp="close">Ver como funciona</a>
-        <a class="btn btn-sm btn-outline" href="#/entrar?m=signup" data-hp="close" id="hp-signup">Criar a minha banca</a>
+        <p id="hp-text">${fmt(tx("hand_msg"))}</p>
+        <div class="hp-btns"><a class="btn btn-sm btn-primary" href="#/bem-vindo" data-hp="close" id="hp-more">${esc(tx("hand_more"))}</a>
+        <a class="btn btn-sm btn-outline" href="#/entrar?m=signup" data-hp="close" id="hp-signup">${esc(tx("hand_signup"))}</a>
         <button class="btn btn-sm btn-ghost" type="button" data-hp="guide">Guia rápido</button>
         <button class="btn btn-sm btn-ghost" type="button" data-hp="help">Preciso de ajuda</button></div></div></div>
     <button class="hp-hand" id="hp-hand" type="button" data-hp="toggle" aria-label="Ajuda e guia">${HAND}</button>`;
   document.body.appendChild(d);
+  window.__hpRefresh = () => { const q = i => document.getElementById(i); if (q("hp-text")) q("hp-text").innerHTML = fmt(tx("hand_msg")); if (q("hp-more")) q("hp-more").textContent = tx("hand_more"); if (q("hp-signup")) q("hp-signup").textContent = tx("hand_signup"); };
   const bub = () => document.getElementById("hp-bubble");
   let _t = null;
   const open = () => {
@@ -1890,14 +1945,14 @@ async function viewWelcome() {
   return `<div class="welcome">
     <img class="welcome-logo" src="${LOGO_SRC}" alt="" width="150" height="150">
     <h1>${esc(CONFIG.APP_SHORT)}</h1>
-    <p class="welcome-tag">${esc(CONFIG.TAGLINE)}</p>
+    <p class="welcome-tag">${esc(tx("tagline"))}</p>
     <ul class="welcome-list">
-      <li><b>Põe a foto</b><span>Do teu produto.</span></li>
-      <li><b>Põe o preço</b><span>E o nome.</span></li>
-      <li><b>Partilha o link</b><span>No estado, no Facebook, onde quiseres.</span></li>
+      <li><b>${esc(tx("w1_t"))}</b><span>${esc(tx("w1_s"))}</span></li>
+      <li><b>${esc(tx("w2_t"))}</b><span>${esc(tx("w2_s"))}</span></li>
+      <li><b>${esc(tx("w3_t"))}</b><span>${esc(tx("w3_s"))}</span></li>
     </ul>
-    <p class="welcome-safe">Não substitui o teu WhatsApp. Só arruma.</p>
-    <a class="welcome-btn primary" href="#/entrar?m=signup">Criar a minha banca</a>
+    <p class="welcome-safe">${esc(tx("w_safe"))}</p>
+    <a class="welcome-btn primary" href="#/entrar?m=signup">${esc(tx("cta_signup"))}</a>
     <a class="welcome-btn" href="#/entrar">Já tenho conta · Entrar</a>
     <a class="welcome-btn violet" href="#/">Explorar as bancas</a>
   </div>`;
@@ -1915,7 +1970,7 @@ function expiryBanner(mine) {
   return "";
 }
 function heroCta() {
-  if (!S.user) return `<a class="landing-cta" href="#/entrar?m=signup">Criar a minha banca</a><span class="landing-note">Grátis · 2 minutos</span>`;
+  if (!S.user) return `<a class="landing-cta" href="#/entrar?m=signup">${esc(tx("cta_signup"))}</a><span class="landing-note">${esc(tx("cta_note"))}</span>`;
   if (!S.profile) return `<a class="landing-cta" href="#/criar-perfil">Completar a minha banca</a>`;
   return `<a class="landing-cta" href="#/publicar">Publicar agora</a>`;
 }
@@ -1930,8 +1985,8 @@ async function viewHome() {
   return `<div class="container pad">
     <div class="hero">
       <img class="hero-logo" src="${LOGO_SRC}" alt="" width="84" height="84">
-      <h1 id="hero-rot" aria-live="off">Põe tudo num só link.</h1>
-      <p id="hero-sub">Continuas no teu WhatsApp. Aqui fica tudo arrumado.</p>
+      <h1 id="hero-rot" aria-live="off">${esc(tx("hero1_t"))}</h1>
+      <p id="hero-sub">${esc(tx("hero1_s"))}</p>
       ${heroCta()}
     </div>
     ${expiryBanner(mine)}
@@ -2028,7 +2083,7 @@ function listingUrl(id)   { const b = shareBase(); return b ? `${b}/a/${id}` : (
 
 /** Cartão "O meu link" (só o dono vê): copiar e enviar por WhatsApp. */
 function linkCard(p) {
-  const url = profileUrl(p.slug), msg = `Olha a minha banca no ${CONFIG.APP_NAME}: ${url}`;
+  const url = profileUrl(p.slug), msg = tx("share_msg").replace("{link}", url);
   return `<div class="link-card"><div class="link-card-t">O meu link</div>
     <div class="link-url">${esc(url)}</div>
     <div class="row-gap"><button class="btn btn-ghost btn-sm" data-act="copy" data-url="${esc(url)}">Copiar link</button>
@@ -2331,7 +2386,7 @@ const val = (fd, k) => String(fd.get(k) || "").trim();
 function authCard(inner) {
   return `<div class="container pad"><div class="card pad-card">
     <div class="center"><img class="brand-logo big" src="${LOGO_SRC}" alt="${esc(CONFIG.APP_NAME)}" width="72" height="72"><h1 class="h1" style="margin:10px 0 2px">${esc(CONFIG.APP_SHORT)}</h1>
-    <p class="soft">${esc(CONFIG.TAGLINE)}</p></div>${inner}</div></div>`;
+    <p class="soft">${esc(tx("tagline"))}</p></div>${inner}</div></div>`;
 }
 
 function viewAuth(mode) {
@@ -2481,8 +2536,8 @@ async function viewProfileForm(editing) {
 
   return `<div class="container pad narrow">
     <button class="back" data-act="back">${ic("back", 16)} Voltar</button>
-    <h1 class="h1">${editing ? "Editar perfil" : "Criar a minha banca"}</h1>
-    <p class="soft" style="margin-bottom:14px">${editing ? "Atualiza os teus dados." : "Preenche e ganhas um link só teu. É só partilhar."}</p>
+    <h1 class="h1">${editing ? "Editar perfil" : esc(tx("signup_btn"))}</h1>
+    <p class="soft" style="margin-bottom:14px">${editing ? "Atualiza os teus dados." : tx("signup_sub")}</p>
     <form class="card pad-card" data-form="profile" data-editing="${editing ? "1" : ""}" novalidate>
       <div class="fld"><label class="field-label">Tipo de perfil</label>
         <div class="type-pick">
@@ -2510,7 +2565,7 @@ async function viewProfileForm(editing) {
       ${inp("tiktok", "TikTok", "@utilizador", p.tiktok)}
       ${inp("website", "Website", "https://…", p.website, 'type="url"')}
       <p class="note">O teu email não aparece publicamente. O telefone aparece para os clientes te contactarem.</p>
-      <button class="btn btn-primary btn-full" style="padding:14px" type="submit">${editing ? "Guardar" : "Criar a minha banca"}</button>
+      <button class="btn btn-primary btn-full" style="padding:14px" type="submit">${editing ? "Guardar" : esc(tx("signup_btn"))}</button>
     </form>
     ${editing ? `<div class="card pad-card" style="margin-top:14px"><div class="field-label">Conta</div>
       <p class="soft" style="margin:4px 0 10px">Email da conta: <b>${esc((S.user && S.user.email) || "")}</b></p>
@@ -2712,7 +2767,7 @@ FORMS.listing = async f => {
       throw { userMessage: "A tua loja está cheia por agora. Elimina uma publicação antiga e tenta de novo." };
     const newId = await apiCreateListing({ ...data, kind, images: images || [] });
     resetPhotos(); toast(`Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + newId);
-    setTimeout(() => showModal("Produto na banca", "Partilha o teu link nos teus estados.",
+    setTimeout(() => showModal(tx("pub_t"), tx("pub_b"),
       [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Outro produto", fn: () => go("#/publicar?kind=" + kind) }]), 700);
   }
 };
@@ -2866,11 +2921,11 @@ FORMS.batch = async f => {
   resetBatch(); S.cache.listings = null;
   if (ids.length === 1) {
     toast(`Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + ids[0]);
-    setTimeout(() => showModal("Produto na banca", "Partilha o teu link nos teus estados.",
+    setTimeout(() => showModal(tx("pub_t"), tx("pub_b"),
       [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Outro produto", fn: () => go("#/publicar?kind=" + kind) }]), 700);
   } else {
     go("#/minhas");
-    setTimeout(() => showModal(`${ids.length} produtos na banca`, "Partilha o teu link nos teus estados.", [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Fechar" }]), 600);
+    setTimeout(() => showModal(tx("pubn_t").replace("{n}", ids.length), tx("pubn_b"), [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Fechar" }]), 600);
   }
 };
 async function waitBatch() {
@@ -2941,6 +2996,7 @@ async function viewAdmin() {
     ${st.remind.length ? remindSection(st.remind) : ""}
     ${st.top.length ? `<div class="section-head"><h2>Publicações com mais movimento</h2></div>${st.top.map(t => `<a class="admin-list-item" href="#/a/${esc(t.id)}"><div><div class="li-t">${esc(t.title)}</div><div class="li-s">${esc(t.owner || "")} · WhatsApp ${t.clicks} · ${ic("eye", 12)} ${t.views} · ${ic("heart", 12)} ${t.likes}</div></div>${ic("chevron", 16)}</a>`).join("")}` : ""}
     <div class="col-gap" style="margin-top:14px">
+      ${btn("admin-texts", "edit", "Textos do site", "Muda as palavras do site sem mexer no código")}
       ${btn("admin-notes", "edit", "Notas e mensagens", "As tuas mensagens prontas a copiar")}
       ${btn("admin-users", "user", "Listar utilizadores", "Ver perfis e suspender")}
       ${btn("admin-listings", "list", "Listar publicações", "Suspender ou eliminar")}
@@ -2982,6 +3038,32 @@ function notesPaint() {
     <button class="btn btn-outline btn-sm" data-act="note-add">+ Nova nota</button>`);
 }
 ACTIONS["admin-notes"] = () => notesPaint();
+
+// ── Textos do site: o administrador muda as palavras; vale para toda a gente ──
+function textsPaint() {
+  const groups = [...new Set(TX_DEFS.map(x => x[1]))];
+  adminOut(`<h2 class="h2">Textos do site</h2>
+    <p class="note">Muda as palavras e toca em <b>Guardar</b>. Passa a valer para toda a gente. Só texto. No balão da mão, <b>*assim*</b> fica a negrito. Campo vazio = volta ao original.</p>
+    ${groups.map(g => `<div class="card pad-card tx-group"><h3 class="h3">${esc(g)}</h3>
+      ${TX_DEFS.filter(x => x[1] === g).map(x => `<label class="soft tx-l">${esc(x[2])}</label>
+        <textarea class="field-input tx-f" data-k="${x[0]}" rows="${x[4]}" maxlength="300">${esc(tx(x[0]))}</textarea>
+        <button type="button" class="btn btn-ghost btn-sm" data-act="tx-reset" data-k="${x[0]}">Repor original</button>`).join("")}</div>`).join("")}
+    <button class="btn btn-primary btn-full" data-act="tx-save">Guardar textos</button>`);
+}
+ACTIONS["admin-texts"] = () => textsPaint();
+ACTIONS["tx-reset"] = el => { const f = document.querySelector(`.tx-f[data-k="${el.dataset.k}"]`); if (f) { f.value = TX_DEF[el.dataset.k]; toast("Original reposto. Toca em Guardar."); } };
+ACTIONS["tx-save"] = async el => {
+  const out = {};
+  document.querySelectorAll(".tx-f").forEach(f => { const v = f.value.trim(); if (v && v !== TX_DEF[f.dataset.k]) out[f.dataset.k] = v.slice(0, 300); });
+  el.disabled = true;
+  try {
+    await apiSaveTexts(out);
+    TX = out; try { localStorage.setItem("nlh_tx", JSON.stringify(out)); } catch (e) {}
+    if (window.__hpRefresh) window.__hpRefresh();
+    toast("Guardado. Já vale para toda a gente.");
+  } catch (e) { toast(friendlyError(e)); }
+  el.disabled = false;
+};
 ACTIONS["note-edit"] = el => { const n = notesLoad(), x = n[Number(el.dataset.i)]; if (x) { x[el.dataset.f] = el.value; notesSave(n); } };
 ACTIONS["note-reset"] = el => { const n = notesLoad(), x = n[Number(el.dataset.i)], d = x && NOTES_DEFAULT.find(y => y[2] === x.k); if (!d) return; x.b = d[1]; x.t = d[0]; notesSave(n); notesPaint(); toast("Texto original reposto."); };
 ACTIONS["note-add"] = () => { const n = notesLoad(); n.push({ t: "Nova nota", b: "" }); notesSave(n); notesPaint(); };
@@ -3081,6 +3163,12 @@ const MSG_OFFLINE = `<b>Sem ligação ao servidor.</b> Verifica a internet. <but
 
   loadFirebase().then(() => {
     initFirebase();
+    apiLoadTexts().then(t => {                       // textos editados no painel (se não houver, ficam os originais)
+      const clean = {}; Object.keys(t || {}).forEach(k => { if (TX_DEF[k] !== undefined && typeof t[k] === "string") clean[k] = t[k]; });
+      if (JSON.stringify(clean) === JSON.stringify(TX)) return;
+      TX = clean; try { localStorage.setItem("nlh_tx", JSON.stringify(clean)); } catch (e) {}
+      if (window.__hpRefresh) window.__hpRefresh(); if (!document.querySelector("form")) render();
+    }).catch(() => {});
     apiOnAuth(async user => {
       clearTimeout(giveUp);
       S.fb = "ready"; setBanner("");
@@ -3105,13 +3193,9 @@ const MSG_OFFLINE = `<b>Sem ligação ao servidor.</b> Verifica a internet. <but
 
 
 // ══════════ HERO: frase que alterna (a faixa roxa fica SEMPRE; só o texto muda) ══════════
-const HERO_PHRASES = [
-  ["Põe tudo num só link.", "Continuas no teu WhatsApp. Aqui fica tudo arrumado."],
-  ["As bancas deste mercado estão a abrir. Abre a tua!", "Quem entra agora faz parte da construção deste mercado."],
-  ["O teu estado desaparece. A tua banca não.", "Fotos e preços sempre à mão, num só endereço. É grátis."],
-  ["Vê quantos olharam para os teus produtos.", "Gostos, visualizações e toques no WhatsApp, tudo na tua banca."],
+const heroPhrases = () => [1, 2, 3, 4].map(i => [esc(tx("hero" + i + "_t")), esc(tx("hero" + i + "_s"))]).concat([
   ["<span class=\"nmark\">N</span>tlhanganu: onde as pessoas se encontram para negociar", "Vendedores e clientes do país inteiro, num só lugar."]
-];
+]);
 (function heroRotator() {
   let i = 0;
   // desliza para a esquerda, troca o texto, e entra pela direita (sem piscar)
@@ -3128,9 +3212,10 @@ const HERO_PHRASES = [
   setInterval(() => {
     const h = document.getElementById("hero-rot");
     if (!h || document.hidden) return;
-    i = (i + 1) % HERO_PHRASES.length;
-    swap(h, HERO_PHRASES[i][0]);
-    setTimeout(() => swap(document.getElementById("hero-sub"), HERO_PHRASES[i][1]), 150);
+    const HP = heroPhrases();
+    i = (i + 1) % HP.length;
+    swap(h, HP[i][0]);
+    setTimeout(() => swap(document.getElementById("hero-sub"), HP[i][1]), 150);
   }, 7000);
 })();
 
