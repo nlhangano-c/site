@@ -2956,6 +2956,8 @@ function remindMsg(r) {
   return remFill((note && note.b) || def[1], { nome: first, produto, quando, link });
 }
 const REM_LABEL = { expiring: r => r.days <= 1 ? "Termina amanhã" : "Termina em 2 dias", expired: () => "Já terminou", nopub: () => "Ainda não publicou" };
+let _remList = [];
+ACTIONS["admin-remind"] = () => adminOut(remindSection(_remList));
 function remindSection(list) {
   const todo = list.filter(r => !remDone(r)).length;
   return `<div class="section-head"><h2 id="rem-h">Lembretes para enviar (${todo} por avisar)</h2></div>
@@ -2985,6 +2987,7 @@ ACTIONS["rem-next"] = () => {
 async function viewAdmin() {
   if (!S.isAdmin) return emptyBox("Acesso reservado", "Esta área é só para administradores.", `<a class="btn btn-primary btn-sm" href="#/">Ir para o início</a>`);
   const st = await apiAdminStats();
+  _remList = st.remind || [];
   const box = (v, l) => `<div class="admin-stat-card"><div class="admin-stat-value gradient-text">${v}</div><div class="admin-stat-label">${l}</div></div>`;
   const btn = (act, icon, t, s) => `<button class="admin-action" data-act="${act}"><span class="admin-ico">${ic(icon, 20)}</span><span><b>${t}</b><small>${s}</small></span></button>`;
   return `<div class="container pad narrow">
@@ -2993,9 +2996,9 @@ async function viewAdmin() {
       ${box(st.total, "Publicações")}${box(st.active, "Activas")}${box(st.expired, "Expiradas")}${box(st.likes, "Gostos")}${box(st.clicks, "Cliques no WhatsApp")}${box(st.views, "Visualizações")}${box(st.visitsToday, "Visitas hoje")}${box(st.visitsWeek, "Visitas (7 dias)")}</div>
     ${st.users ? `<p class="soft" style="margin:6px 0 4px;font-size:12px">${Math.round(st.publishers / st.users * 100)}% dos inscritos já publicaram.</p>` : ""}
     ${st.provinces.length ? `<p class="soft" style="margin:0 0 12px;font-size:12px">Por província: ${st.provinces.map(([k, n]) => esc(k) + " " + n).join(" · ")}</p>` : ""}
-    ${st.remind.length ? remindSection(st.remind) : ""}
     ${st.top.length ? `<div class="section-head"><h2>Publicações com mais movimento</h2></div>${st.top.map(t => `<a class="admin-list-item" href="#/a/${esc(t.id)}"><div><div class="li-t">${esc(t.title)}</div><div class="li-s">${esc(t.owner || "")} · WhatsApp ${t.clicks} · ${ic("eye", 12)} ${t.views} · ${ic("heart", 12)} ${t.likes}</div></div>${ic("chevron", 16)}</a>`).join("")}` : ""}
     <div class="col-gap" style="margin-top:14px">
+      ${st.remind.length ? btn("admin-remind", "bell", "Lembretes para enviar", `${st.remind.filter(r => !remDone(r)).length} por avisar (de ${st.remind.length})`) : ""}
       ${btn("admin-texts", "edit", "Textos do site", "Muda as palavras do site sem mexer no código")}
       ${btn("admin-notes", "edit", "Notas e mensagens", "As tuas mensagens prontas a copiar")}
       ${btn("admin-users", "user", "Listar utilizadores", "Ver perfis e suspender")}
@@ -3006,7 +3009,7 @@ async function viewAdmin() {
     <div id="admin-out"></div></div>`;
 }
 
-const adminOut = html => { const o = $("#admin-out"); if (o) o.innerHTML = html; };
+const adminOut = html => { const o = $("#admin-out"); if (o) { o.innerHTML = html; try { o.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {} } };
 
 // ── Notas e mensagens: textos prontos a copiar (ficam guardados neste telemóvel) ──
 const NOTES_DEFAULT = [
