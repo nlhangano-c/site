@@ -100,8 +100,19 @@ const CONFIG = {
   },
 
   // ── Regras das publicações (podes ajustar os números) ────────────
-  EXPIRY_DAYS: 7,                 // dias que uma publicação fica visível
+  PAUSE_EXPIRY: true,             // true = FASE DE VALIDAÇÃO: as publicações NÃO somem (ficam no ar), mas o ritmo dos 7 dias continua para o vendedor (avisos «publica mais»). Para voltar ao normal: false e, no painel, tocar em «Reiniciar prazos»
+  EXPIRY_DAYS: 7,                 // dias que uma publicação fica visível (quando PAUSE_EXPIRY é false)
   GRACE_DAYS: 30,                 // dias extra antes de apagar de vez (dá tempo de renovar)
+  // ── Visibilidade: Destaques e Bancas novas (muda aqui os números) ─
+  DESTAQUE_TOP: 10,               // quantas bancas entram nos Destaques da semana
+  DESTAQUE_MIN_CLICKS: 3,         // cliques válidos na semana para entrar (sobe quando houver mais gente)
+  DESTAQUE_DAYS: 7,               // janela dos Destaques (dias)
+  NOVAS_DAYS: 14,                 // «banca nova» = criada nos últimos N dias
+  NOVAS_MAX: 10,                  // quantas bancas novas mostrar
+  PROFILES_LOAD: 60,              // quantas bancas se carregam na página inicial (cada uma é 1 leitura no Firebase)
+  // ── Fotos: avisos de qualidade ───────────────────────────────────
+  PHOTO_MIN_SIDE: 400,            // lado menor abaixo disto = foto pequena
+  PHOTO_BLUR_MIN: 40,             // nitidez abaixo disto = foto desfocada (mais alto = avisa mais vezes)
   MAX_PUBLICATIONS_PER_USER: 30,  // máximo de publicações activas por pessoa (só para evitar abusos)
   MAX_IMAGES: 12,                 // máximo de fotos por publicação
   MAX_UPLOAD_MB: 40,              // tamanho máximo da foto original (é reduzida no telemóvel antes de enviar)
@@ -247,8 +258,8 @@ textarea.field-input{resize:vertical}
 .landing-cta{background:#fff;color:var(--color-primary);font-weight:700;font-size:14px;padding:13px 24px;border-radius:var(--r-xl);box-shadow:0 8px 24px rgba(0,0,0,.15);display:inline-block;position:relative}
 .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .section-head h2{font-size:15px;font-weight:700}.section-head>a:not(.btn){font-size:12px;color:var(--color-primary);font-weight:600}
-#profiles-strip{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin:0 -16px 20px;padding-left:16px;padding-right:16px;scrollbar-width:none}
-#profiles-strip::-webkit-scrollbar{display:none}
+#profiles-strip,#destaques-strip{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;margin:0 -16px 20px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+#profiles-strip::-webkit-scrollbar,#destaques-strip::-webkit-scrollbar{display:none}
 .story{flex-shrink:0;text-align:center;width:64px}
 .story-ring{display:block;width:60px;height:60px;margin:0 auto 6px;padding:2px;border-radius:50%;background:var(--gradient-main)}
 .story-ring.soon{background:#4c1d95}.story-ring.none{background:#e2e8f0}
@@ -437,7 +448,17 @@ body.landing #app{background:var(--gradient-main)}
 .hero h1#hero-rot.pre,.hero p#hero-sub.pre{opacity:0;transform:translateX(40px);transition:none}
 .hero p#hero-sub{min-height:40px}
 .exp-banner{display:flex;align-items:center;gap:10px;background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:var(--r-xl);padding:12px 14px;margin:0 0 16px;font-size:13px;font-weight:600}
-.exp-banner a{margin-left:auto;white-space:nowrap;background:#f59e0b;color:#fff;padding:7px 12px;border-radius:var(--r-full);font-size:12px;font-weight:700}
+.exp-banner a,.exp-banner .coach-btn{margin-left:auto;white-space:nowrap;background:#f59e0b;color:#fff;padding:7px 12px;border-radius:var(--r-full);font-size:12px;font-weight:700;border:0;cursor:pointer}
+.exp-banner .coach-x{background:none;border:0;color:#78350f;opacity:.55;font-size:20px;line-height:1;padding:0 2px;cursor:pointer}
+.story.rank{position:relative;min-width:88px}.rank-n{position:absolute;top:-4px;left:4px;z-index:2;background:#f59e0b;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px}
+.story.rank .story-cat{white-space:normal;text-align:center;line-height:1.15;color:#b45309;font-weight:700;font-size:10px}
+.bc-card{background:#fff;border:1px solid var(--color-border);border-radius:var(--r-xl);padding:14px;margin:0 0 16px}
+.bc-t{font-size:17px;margin:0 0 6px}.bc-lab{font-size:12px;font-weight:700;color:#64748b;margin:10px 0 6px}
+.bc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bc-cell{background:#f8fafc;border:1px solid var(--color-border);border-radius:12px;padding:10px 4px;text-align:center}
+.bc-cell b{display:block;font-size:20px}.bc-cell small{font-size:11px;color:#64748b}
+.bc-rank{margin:12px 0 0;font-size:13px;font-weight:600;color:#78350f;background:#fffbeb;border:1px solid #fcd34d;border-radius:12px;padding:9px 11px}
+.bc-prod{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--color-border);font-size:14px;font-weight:600}.bc-prod small{font-weight:400;color:#64748b;font-size:12px}
+.pv.weak{outline:2px solid #f59e0b;outline-offset:-2px}.pv-warn{position:absolute;left:3px;bottom:3px;background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px}
 .lb{position:fixed;inset:0;z-index:9999;background:rgba(2,6,23,.95);display:flex;flex-direction:column}
 .lb-top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;color:#fff;font-size:13px;font-weight:600}
 .lb-x{background:rgba(255,255,255,.16);color:#fff;border:0;width:42px;height:42px;border-radius:50%;font-size:24px;line-height:1;cursor:pointer}
@@ -496,7 +517,7 @@ body.landing #app{background:var(--gradient-main)}
 .badge-expiry.warn{background:rgba(249,115,22,.14);color:#c2410c;border:1px solid rgba(249,115,22,.32)}
 .badge-expiry.last{background:rgba(234,88,12,.2);color:#9a3412;border:1px solid rgba(194,65,12,.45)}
 .gal-wrap:not(.d) .gal-slide{position:relative;overflow:hidden;background:#0f172a}
-.gal-wrap:not(.d) .gal-slide::before{content:"";position:absolute;inset:-14px;background:var(--bg) center/cover no-repeat;filter:blur(9px) brightness(.92) saturate(1.3);transform:scale(1.1)}
+.gal-wrap:not(.d) .gal-slide::before{content:"";position:absolute;inset:-14px;background:var(--bg) center/cover no-repeat;filter:blur(var(--gal-blur,3px)) brightness(.95) saturate(1.2);transform:scale(1.1)}
 .gal-wrap:not(.d) .gal-slide.cv img{object-fit:cover}
 .gal-wrap:not(.d) .gal-slide img{position:relative;object-fit:contain}
 .pub-img-carousel{object-fit:contain;background:#0f172a}
@@ -528,7 +549,7 @@ body.landing #app{background:var(--gradient-main)}
 @keyframes hpdot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .hp-msg p{margin:0 0 10px;background:#f1f5f9;border-radius:16px 16px 16px 4px;padding:10px 12px}.hp-msg b{color:#4c1d95}
 .batch-link{margin:0 0 12px}
-.rem-done{opacity:.55}.rem-chip{font-weight:700}.rem-chip.expiring{color:#c2410c}.rem-chip.expired{color:#9a3412}.rem-chip.nopub{color:#4f46e5}
+.rem-done{opacity:.55}.rem-chip{font-weight:700}.rem-chip.expiring,.rem-chip.stale{color:#c2410c}.rem-chip.expired{color:#9a3412}.rem-chip.nopub{color:#4f46e5}
 .pv-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:2px dashed #a5b4fc;background:#eef2ff;color:#4f46e5;cursor:pointer}.pv-add small{font-size:11px;font-weight:600}
 .bt-list{display:flex;flex-direction:column;gap:12px;margin:6px 0 14px}
 .bt-row{border:1px solid var(--color-border);border-radius:14px;padding:10px;background:#fff}
@@ -668,8 +689,34 @@ function toMillis(t) {
 function daysLeft(item) {
   return Math.max(0, Math.ceil((toMillis(item.expiresAt) - Date.now()) / DAY_MS));
 }
+/** Fase de validação: momento da última publicação/subida (a data de fim guarda esse momento + 10 anos). */
+function refreshedAt(l) {
+  const e = toMillis(l.expiresAt), c = toMillis(l.createdAt), far = e - 3650 * DAY_MS;
+  return far > c - DAY_MS ? far : (e ? e - CONFIG.EXPIRY_DAYS * DAY_MS : c);
+}
+function staleDays(l) { return Math.max(0, Math.floor((Date.now() - refreshedAt(l)) / DAY_MS)); }
+/** Chave do dia (UTC) dos contadores: c_2026_11_11 = cliques, v_2026_11_11 = visitas à banca. */
+const dKey = (off = 0) => { const d = new Date(Date.now() - off * DAY_MS); return d.getUTCFullYear() + "_" + (d.getUTCMonth() + 1) + "_" + d.getUTCDate(); };
+function dayStats(p) {
+  p = p || {}; let cT = 0, vT = 0, c7 = 0, v7 = 0;
+  for (const k in p) if (k.length > 6 && k[1] === "_" && (k[0] === "c" || k[0] === "v")) { const x = Number(p[k]) || 0; if (k[0] === "c") cT += x; else vT += x; }
+  for (let i = 0; i < CONFIG.DESTAQUE_DAYS; i++) { c7 += Number(p["c_" + dKey(i)]) || 0; v7 += Number(p["v_" + dKey(i)]) || 0; }
+  return { cToday: Number(p["c_" + dKey(0)]) || 0, vToday: Number(p["v_" + dKey(0)]) || 0, c7, v7, cTotal: cT, vTotal: vT };
+}
+/** Bancas que cumprem o mínimo de cliques da semana, da mais clicada para a menos. */
+function rankedBancas(profiles) {
+  return (profiles || []).filter(p => p.status !== "suspended").map(p => ({ p, c: dayStats(p).c7 }))
+    .filter(x => x.c >= CONFIG.DESTAQUE_MIN_CLICKS).sort((a, b) => b.c - a.c || toMillis(a.p.createdAt) - toMillis(b.p.createdAt));
+}
+const fillT = (t, v) => String(t).replace(/\{(\w+)\}/g, (m, k) => v[k] == null ? m : v[k]);
+/** Mistura a lista de forma justa: a ordem muda de hora a hora (e não a cada carregamento). */
+function hourShuffle(arr) {
+  let s0 = Math.floor(Date.now() / 3600000) >>> 0;
+  const rnd = () => { s0 = (s0 + 0x6D2B79F5) >>> 0; let t = s0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
+}
 function isActive(item) {
-  return toMillis(item.expiresAt) > Date.now() && item.status === "active";
+  return item.status === "active" && (CONFIG.PAUSE_EXPIRY || toMillis(item.expiresAt) > Date.now());
 }
 
 function debounce(fn, ms) {
@@ -772,15 +819,53 @@ async function probeImageSize(file) {
   return null;
 }
 
-/** Desenha numa tela pequena (lado maior = IMAGE_MAX_PX) e devolve um JPEG leve. */
+/** Nitidez: variância do Laplaciano numa miniatura em tons de cinza (baixa = desfocada). */
+function sharpnessOf(src, sx, sy, sw, sh) {
+  const W = 320, H = Math.max(8, Math.round(W * sh / sw)), c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(src, sx, sy, sw, sh, 0, 0, W, H);
+  const d = cx.getImageData(0, 0, W, H).data, g = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) g[i] = d[i * 4] * 0.299 + d[i * 4 + 1] * 0.587 + d[i * 4 + 2] * 0.114;
+  let t = 0, t2 = 0, k = 0;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x, l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - W] - g[i + W]; t += l; t2 += l * l; k++; }
+  return k ? t2 / k - (t / k) * (t / k) : 0;
+}
+const photoDebug = () => /[?&]fotos=1/.test(location.hash);   // abre #/publicar?fotos=1 para ver a nitidez de cada foto
+/** Captura de ecrã = foto alta e estreita com faixas lisas em cima/baixo (hora, bateria, botões). Devolve quanto cortar, ou null se não tiver quase certeza. */
+function screenshotBands(src, w, h) {
+  if (h / w < 1.9) return null;
+  const W = 48, H = Math.min(160, Math.round(W * h / w)), c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(src, 0, 0, W, H);
+  const d = cx.getImageData(0, 0, W, H).data, flat = [];
+  for (let y = 0; y < H; y++) {                                  // linha «lisa» = quase todos os pontos com a mesma luz
+    const v = []; for (let x = 0; x < W; x++) { const k = (y * W + x) * 4; v.push(d[k] * 0.299 + d[k + 1] * 0.587 + d[k + 2] * 0.114); }
+    const med = v.slice().sort((p, q) => p - q)[W >> 1];
+    flat.push(v.filter(z => Math.abs(z - med) <= 14).length / W >= 0.7);
+  }
+  const lim = Math.floor(H * 0.1); let t = 0, b = 0;
+  while (t < lim && flat[t]) t++;
+  while (b < lim && flat[H - 1 - b]) b++;
+  const min = Math.ceil(H * 0.02);
+  if (t < min && b < min) return null;
+  return { t: t / H, b: b / H };
+}
+/** Desenha numa tela pequena (lado maior = IMAGE_MAX_PX) e devolve um JPEG leve. Corta as barras das capturas de ecrã e marca fotos fracas (blob.weak). */
 function drawToBlob(src, w, h) {
-  const r = Math.min(1, CONFIG.IMAGE_MAX_PX / Math.max(w, h));
+  let sy = 0, sh = h, weak = "", cropped = false, sharp = -1;
+  try {
+    const bd = screenshotBands(src, w, h);
+    if (bd) { sy = Math.round(bd.t * h); sh = Math.max(1, Math.round(h * (1 - bd.t - bd.b))); cropped = true; }
+    if (Math.min(w, sh) < CONFIG.PHOTO_MIN_SIDE) weak = "small";
+    else { sharp = sharpnessOf(src, 0, sy, w, sh); if (sharp < CONFIG.PHOTO_BLUR_MIN) weak = "blur"; }
+  } catch (e) { if (CONFIG.DEBUG) console.warn("análise da foto falhou", e); }
+  const r = Math.min(1, CONFIG.IMAGE_MAX_PX / Math.max(w, sh));
   const c = document.createElement("canvas");
-  c.width = Math.max(1, Math.round(w * r)); c.height = Math.max(1, Math.round(h * r));
+  c.width = Math.max(1, Math.round(w * r)); c.height = Math.max(1, Math.round(sh * r));
   const ctx = c.getContext("2d");
   ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);   // PNG com transparência fica com fundo branco
-  ctx.drawImage(src, 0, 0, c.width, c.height);
-  return new Promise(res => c.toBlob(b => res(b), "image/jpeg", CONFIG.IMAGE_QUALITY));
+  ctx.drawImage(src, 0, sy, w, sh, 0, 0, c.width, c.height);
+  return new Promise(res => c.toBlob(bl => { if (bl) { bl.weak = weak; bl.cropped = cropped; bl.sharp = Math.round(sharp); } res(bl); }, "image/jpeg", CONFIG.IMAGE_QUALITY));
 }
 
 /** Reduz a foto no telemóvel ANTES de enviar (poupa dados e espaço grátis).
@@ -952,7 +1037,7 @@ async function apiUpdateProfile(uid, data) {
 async function apiLoadProfiles() {
   if (!db) return [];
   if (S.cache.profiles && Date.now() - S.cache.profilesAt < 60000) return S.cache.profiles;
-  const snap = await getDocs(query(collection(db, "profiles"), orderBy("createdAt", "desc"), limit(20)));
+  const snap = await getDocs(query(collection(db, "profiles"), orderBy("createdAt", "desc"), limit(CONFIG.PROFILES_LOAD)));
   S.cache.profiles = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.status !== "suspended");
   S.cache.profilesAt = Date.now();
   return S.cache.profiles;
@@ -975,8 +1060,9 @@ const _l = d => ({ id: d.id, ...d.data() });
 async function apiLoadListings(force) {
   if (!db) return [];
   if (!force && S.cache.listings && Date.now() - S.cache.listingsAt < 60000) return S.cache.listings;
-  const q = query(collection(db, "listings"),
-    where("expiresAt", ">", Timestamp.now()), orderBy("expiresAt", "desc"), limit(80));
+  const q = CONFIG.PAUSE_EXPIRY
+    ? query(collection(db, "listings"), orderBy("expiresAt", "desc"), limit(80))
+    : query(collection(db, "listings"), where("expiresAt", ">", Timestamp.now()), orderBy("expiresAt", "desc"), limit(80));
   const snap = await getDocs(q);
   S.cache.listings = snap.docs.map(_l).filter(l => l.status === "active");
   S.cache.listingsAt = Date.now();
@@ -997,6 +1083,7 @@ async function apiLoadListing(id) {
 
 function _expiryFields() {
   const now = Date.now();
+  if (CONFIG.PAUSE_EXPIRY) return { expiresAt: Timestamp.fromMillis(now + 3650 * DAY_MS), purgeAt: Timestamp.fromMillis(now + (3650 + CONFIG.GRACE_DAYS) * DAY_MS) };
   return {
     expiresAt: Timestamp.fromMillis(now + CONFIG.EXPIRY_DAYS * DAY_MS),
     // purgeAt: o Firestore (política TTL) apaga o documento nesta data
@@ -1172,16 +1259,22 @@ async function apiAdminStats() {
     // Lembretes: quem termina em breve, quem já ficou sem publicações activas, e quem ainda não publicou
     const prof = {}; pS.docs.forEach(d => { prof[d.id] = { id: d.id, ...d.data() }; });
     const by = {}, nowMs = Date.now();
-    lS.docs.forEach(d => { const x = d.data(); (by[x.ownerId] = by[x.ownerId] || []).push({ title: x.title, exp: toMillis(x.expiresAt), st: x.status }); });
-    const expiring = [], expired = [];
+    lS.docs.forEach(d => { const x = d.data(); (by[x.ownerId] = by[x.ownerId] || []).push({ title: x.title, exp: toMillis(x.expiresAt), st: x.status, ref: refreshedAt(x) }); });
+    const expiring = [], expired = [], stale = [];
     Object.keys(by).forEach(uid => {
       const pr = prof[uid]; if (!pr || pr.status === "suspended") return;
+      if (CONFIG.PAUSE_EXPIRY) {                       // fase de validação: avisa quem já passou os dias sem publicar
+        const ac = by[uid].filter(a => a.st === "active");
+        if (ac.length) { const d = Math.floor((nowMs - Math.max(...ac.map(a => a.ref))) / 864e5); if (d >= CONFIG.EXPIRY_DAYS) stale.push({ kind: "stale", p: pr, days: d, titles: ac.map(a => a.title), count: ac.length }); }
+        return;
+      }
       const act = by[uid].filter(a => a.st === "active" && a.exp > nowMs), soon = act.filter(a => a.exp - nowMs <= 2 * 864e5);
       if (soon.length) expiring.push({ kind: "expiring", p: pr, days: Math.max(1, Math.ceil((Math.min(...soon.map(a => a.exp)) - nowMs) / 864e5)), titles: soon.map(a => a.title), count: soon.length });
       else if (!act.length) expired.push({ kind: "expired", p: pr, titles: by[uid].map(a => a.title), count: by[uid].length });
     });
     expiring.sort((a, b) => a.days - b.days);
-    out.remind = [...expiring, ...out.noPub.filter(u => u.status !== "suspended").map(u => ({ kind: "nopub", p: u })), ...expired].slice(0, 60);
+    stale.sort((a, b) => b.days - a.days);
+    out.remind = [...expiring, ...stale, ...out.noPub.filter(u => u.status !== "suspended").map(u => ({ kind: "nopub", p: u })), ...expired].slice(0, 60);
     try {                                              // visitas por dia (contador próprio do site)
       const vs = await getDocs(collection(db, "stats"));
       const days = vs.docs.map(d => ({ day: d.id, n: (d.data().visits || 0) })).sort((a, b) => b.day.localeCompare(a.day));
@@ -1217,6 +1310,23 @@ async function apiAdminSetUserStatus(uid, status) {
 async function apiAdminSetListingStatus(id, status) {
   await updateDoc(doc(db, "listings", id), { status });
   S.cache.listings = null;
+}
+
+/** Dá nova vida a TODAS as publicações activas (não toca nas suspensas). Pausa: sem prazo, mantém a ordem original. Normal: 7 dias a partir de agora. */
+async function apiAdminReactivateAll() {
+  const snap = await getDocs(query(collection(db, "listings"), limit(500)));
+  const now = Date.now(); let n = 0;
+  const docs = snap.docs.filter(d => d.data().status === "active");
+  for (let i = 0; i < docs.length; i += 20) {
+    await Promise.all(docs.slice(i, i + 20).map(d => {
+      const x = d.data();
+      const exp = CONFIG.PAUSE_EXPIRY ? (toMillis(x.createdAt) || now) + 3650 * DAY_MS : now + CONFIG.EXPIRY_DAYS * DAY_MS;
+      n++;
+      return updateDoc(d.ref, { expiresAt: Timestamp.fromMillis(exp), purgeAt: Timestamp.fromMillis(exp + CONFIG.GRACE_DAYS * DAY_MS) });
+    }));
+  }
+  S.cache.listings = null;
+  return n;
 }
 
 /** Apaga já as publicações expiradas (o TTL também o faz sozinho). */
@@ -1304,8 +1414,16 @@ function ageDays(l) { const t = toMillis(l.createdAt); return t ? Math.max(0, Ma
 function leftCls(d) { return d >= 5 ? "ok" : d >= 3 ? "mid" : d >= 2 ? "warn" : "last"; }
 function badge(l, mode) {
   const d = daysLeft(l), a = ageDays(l);
-  const txt = mode === "left" ? `${d}d` : (a < 1 ? "hoje" : `há ${a}d`);
+  const txt = mode === "left" && !CONFIG.PAUSE_EXPIRY ? `${d}d` : (a < 1 ? "hoje" : `há ${a}d`);
+  if (CONFIG.PAUSE_EXPIRY) return isNew(l) ? `<span class="badge-new">Novo</span>` : "";
   return `${isNew(l) ? `<span class="badge-new">Novo</span>` : ""}<span class="badge-expiry ${leftCls(d)}" title="Faltam ${d} dia(s)">${txt}</span>`;
+}
+
+/** O dono vê há quantos dias publicou; passados os 7 dias o selo fica laranja. */
+function ownBadge(l) {
+  if (!CONFIG.PAUSE_EXPIRY) return badge(l, "left");
+  const d = staleDays(l);
+  return `<span class="badge-expiry ${d >= CONFIG.EXPIRY_DAYS ? "warn" : "ok"}">${d < 1 ? "hoje" : "há " + d + "d"}</span>`;
 }
 
 function thumb(l, cls) {
@@ -1391,7 +1509,7 @@ function serviceCard(l) {
       <a href="#/a/${esc(l.id)}"><h3 class="service-feed-title">${esc(l.title)}</h3></a>
       <div class="price">${esc(formatPrice(l.price))}</div>
       <p class="service-feed-desc">${esc((l.description || "").slice(0, 160))}${(l.description || "").length > 160 ? "…" : ""}</p>
-      <div class="expiry-bar"><div class="expiry-fill" style="width:${pct}%"></div></div>
+      ${CONFIG.PAUSE_EXPIRY ? "" : `<div class="expiry-bar"><div class="expiry-fill" style="width:${pct}%"></div></div>`}
       ${wa ? `<a class="btn btn-wa btn-full" href="${esc(wa)}"${waAttr(l)} target="_blank" rel="noopener noreferrer">${WA_SVG} Contactar via WhatsApp</a>` : ""}
     </div></article>`;
 }
@@ -1453,9 +1571,18 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawer(
 function trackWhatsApp(id, ownerId) {
   if (!db || !id) return;
   if (S.user && ownerId === S.user.uid) return;                 // os teus próprios cliques não contam
+  trackBanca(ownerId, "c");                                     // contador da banca (1 por pessoa por banca a cada 24 h)
   const k = "nlh_wa_" + id;
   try { const t = Number(localStorage.getItem(k)) || 0; if (Date.now() - t < 6 * 3600000) return; localStorage.setItem(k, String(Date.now())); } catch (e) {}
   apiTrackWhatsApp(id).catch(e => { if (CONFIG.DEBUG) console.warn("clique não contado", e); });
+}
+/** Soma 1 ao contador do dia da banca: kind "c" = clique no WhatsApp, "v" = visita. Sem repetidos do mesmo aparelho em 24 h. */
+function trackBanca(uid, kind) {
+  if (!db || !uid) return;
+  if (S.user && uid === S.user.uid) return;
+  const k = "nlh_b" + kind + "_" + uid;
+  try { const t = Number(localStorage.getItem(k)) || 0; if (Date.now() - t < 24 * 3600000) return; localStorage.setItem(k, String(Date.now())); } catch (e) {}
+  updateDoc(doc(db, "profiles", uid), { [kind + "_" + dKey(0)]: increment(1) }).catch(e => { if (CONFIG.DEBUG) console.warn("contador da banca falhou", e); });
 }
 document.addEventListener("click", e => {
   const a = e.target.closest && e.target.closest("a[data-wa]");
@@ -1644,7 +1771,20 @@ const TX_DEFS = [
   ["faq3_q", "Ajuda", "Pergunta 3", "Como crio a minha banca?", 1],
   ["faq3_a", "Ajuda", "Resposta 3", "Toca em «Criar a minha banca». Põe o email, uma palavra-passe, o teu nome e o WhatsApp. São 2 minutos.", 3],
   ["faq4_q", "Ajuda", "Pergunta 4", "Como partilho o meu link?", 1],
-  ["faq4_a", "Ajuda", "Resposta 4", "Toca em «Partilhar» na tua banca ou num produto. Envia no WhatsApp, no estado ou nos grupos.", 3]
+  ["faq4_a", "Ajuda", "Resposta 4", "Toca em «Partilhar» na tua banca ou num produto. Envia no WhatsApp, no estado ou nos grupos.", 3],
+  ["coach_empty", "Faixa amarela (guia do vendedor)", "Banca vazia", "A tua banca está vazia. Põe o primeiro produto.", 2],
+  ["coach_stale", "Faixa amarela (guia do vendedor)", "Passaram os dias sem publicar ({d} = dias)", "Já passaram {d} dias. Publica mais para voltares ao topo.", 2],
+  ["coach_weak", "Faixa amarela (guia do vendedor)", "Foto fraca ({produto})", "A foto de «{produto}» está fraca. Tira outra com mais luz.", 2],
+  ["coach_top", "Faixa amarela (guia do vendedor)", "Está nos Destaques ({n} = posição)", "Estás em {n}.º nos Destaques desta semana. Continua a partilhar o teu link.", 2],
+  ["coach_clicks", "Faixa amarela (guia do vendedor)", "Já tem cliques ({c}, {cliques}, {faltam})", "Tiveste {c} {cliques} esta semana. {faltam} para os Destaques.", 2],
+  ["coach_noclick", "Faixa amarela (guia do vendedor)", "Ainda sem cliques", "Ainda ninguém clicou esta semana. Partilha o teu link nos estados e nos grupos.", 2],
+  ["coach_social", "Faixa amarela (guia do vendedor)", "Lembrete: portfólio e redes", "O teu link é o teu portfólio. Põe-no no Instagram, Facebook e TikTok.", 2],
+  ["coach_share", "Faixa amarela (guia do vendedor)", "Lembrete: partilhar hoje", "Hoje já partilhaste a tua banca? Põe o link nos teus estados.", 2],
+  ["coach_see", "Faixa amarela (guia do vendedor)", "Lembrete: ver números", "Vê quem está a olhar: os cliques e as visitas da tua banca estão em «Minhas».", 2],
+  ["coach_btn_pub", "Faixa amarela (guia do vendedor)", "Botão: publicar", "Publicar", 1],
+  ["coach_btn_share", "Faixa amarela (guia do vendedor)", "Botão: partilhar", "Partilhar", 1],
+  ["coach_btn_see", "Faixa amarela (guia do vendedor)", "Botão: ver", "Ver", 1],
+  ["coach_btn_photo", "Faixa amarela (guia do vendedor)", "Botão: trocar foto", "Trocar foto", 1]
 ];
 const TX_DEF = Object.fromEntries(TX_DEFS.map(x => [x[0], x[3]]));
 let TX = (() => { try { const o = JSON.parse(localStorage.getItem("nlh_tx") || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; } })();
@@ -1662,7 +1802,7 @@ function showGuide() {
     ["Como publico um artigo?", "Dentro da tua conta toca em «Publicar». Põe 1 ou mais fotos do mesmo artigo, o nome, o preço e a descrição. Toca nos botões «i» se tiveres dúvida num campo."],
     ["Quero vender outro artigo (outro modelo, cor ou preço)", "Faz outra publicação. Cada artigo tem a sua. Assim cada um tem o seu link e o cliente vê logo o que procura."],
     [tx("faq4_q"), tx("faq4_a")],
-    ["Quanto tempo dura uma publicação?", `Fica visível ${CONFIG.EXPIRY_DAYS} dias. Antes de acabar, tocas em «Renovar» na secção «Minhas» e ela volta a aparecer como nova.`],
+    ["Quanto tempo dura uma publicação?", CONFIG.PAUSE_EXPIRY ? `Fica na tua banca. Passados ${CONFIG.EXPIRY_DAYS} dias, publica de novo para voltares ao topo.` : `Fica visível ${CONFIG.EXPIRY_DAYS} dias. Antes de acabar, tocas em «Renovar» na secção «Minhas» e ela volta a aparecer como nova.`],
     ["Esqueci a palavra-passe", "Na página de entrada toca em «Esqueci a palavra-passe». Chega-te um email com um link para criares outra."],
     ["Não encontro resposta", "Toca em «Preciso de ajuda» e fala connosco no WhatsApp."]
   ];
@@ -1960,14 +2100,28 @@ async function viewWelcome() {
 
 // ══════════ INÍCIO ══════════
 /** Aviso amigável: publicações a acabar (3 dias ou menos) ou loja sem nada activo. */
-function expiryBanner(mine) {
-  if (!mine || !mine.length) return "";
-  const act = mine.filter(isActive), soon = act.filter(l => daysLeft(l) <= 3);
-  if (soon.length)
-    return `<div class="exp-banner"><span>${ic("clock", 15)} ${soon.length === 1 ? "1 produto teu sai" : soon.length + " produtos teus saem"} da banca em breve. Renova e voltas para o topo.</span><a href="#/minhas">Renovar</a></div>`;
-  if (!act.length)
-    return `<div class="exp-banner"><span>A tua banca está sem produtos. Renova ou põe produtos novos.</span><a href="#/minhas">Ver</a></div>`;
-  return "";
+function coachMsg(mine, profiles) {
+  if (!S.user || !S.profile) return null;
+  const act = (mine || []).filter(isActive), pub = { a: "#/publicar", b: tx("coach_btn_pub") };
+  if (!act.length) return { t: tx("coach_empty"), ...pub };
+  if (CONFIG.PAUSE_EXPIRY) { if (Math.min(...act.map(staleDays)) >= CONFIG.EXPIRY_DAYS) return { t: fillT(tx("coach_stale"), { d: CONFIG.EXPIRY_DAYS }), ...pub }; }
+  else { const soon = act.filter(l => daysLeft(l) <= 3); if (soon.length) return { t: `${soon.length === 1 ? "1 produto teu sai" : soon.length + " produtos teus saem"} da banca em breve. Renova e voltas para o topo.`, a: "#/minhas", b: "Renovar" }; }
+  const weak = act.find(l => l.weak);
+  if (weak) return { t: fillT(tx("coach_weak"), { produto: weak.title }), a: "#/editar/" + weak.id, b: tx("coach_btn_photo") };
+  const me = (profiles || []).find(p => p.id === S.user.uid) || S.profile, st = dayStats(me);
+  const pos = rankedBancas(profiles).findIndex(x => x.p.id === S.user.uid) + 1;
+  if (pos && pos <= CONFIG.DESTAQUE_TOP) return { t: fillT(tx("coach_top"), { n: pos }), a: "#/minhas", b: tx("coach_btn_see") };
+  if (st.c7 > 0 && st.c7 < CONFIG.DESTAQUE_MIN_CLICKS) { const m = CONFIG.DESTAQUE_MIN_CLICKS - st.c7; return { t: fillT(tx("coach_clicks"), { c: st.c7, cliques: st.c7 === 1 ? "clique" : "cliques", faltam: m === 1 ? "Falta 1" : "Faltam " + m }), a: "#/minhas", b: tx("coach_btn_see") }; }
+  if (st.c7 === 0) return { t: tx("coach_noclick"), share: 1, b: tx("coach_btn_share") };
+  const rot = ["coach_social", "coach_share", "coach_see"][Math.floor(Date.now() / DAY_MS) % 3];
+  return { t: tx(rot), share: rot !== "coach_see", a: "#/minhas", b: rot === "coach_see" ? tx("coach_btn_see") : tx("coach_btn_share") };
+}
+function expiryBanner(mine, profiles) {
+  let off = false; try { off = sessionStorage.getItem("nlh_coach_x") === "1"; } catch (e) {}
+  if (off) return "";
+  const m = coachMsg(mine, profiles); if (!m) return "";
+  const act = m.share ? `<button type="button" class="coach-btn" data-act="share-my">${esc(m.b)}</button>` : `<a href="${esc(m.a)}">${esc(m.b)}</a>`;
+  return `<div class="exp-banner" data-coach><span>${ic("clock", 15)} ${esc(m.t)}</span>${act}<button type="button" class="coach-x" data-act="coach-x" aria-label="Fechar">×</button></div>`;
 }
 function heroCta() {
   if (!S.user) return `<a class="landing-cta" href="#/entrar?m=signup">${esc(tx("cta_signup"))}</a><span class="landing-note">${esc(tx("cta_note"))}</span>`;
@@ -1975,6 +2129,31 @@ function heroCta() {
   return `<a class="landing-cta" href="#/publicar">Publicar agora</a>`;
 }
 
+function storyCard(p, listings, o) {
+  o = o || {};
+  const ds = listings.filter(l => l.ownerId === p.id).map(daysLeft), ring = !ds.length ? "none" : (!CONFIG.PAUSE_EXPIRY && Math.min(...ds) <= 2 ? "soon" : "");
+  return `<a class="story ${o.cls || ""}" href="#/p/${esc(p.slug)}">${o.pos ? `<span class="rank-n">${o.pos}.º</span>` : ""}
+    <span class="story-ring ${ring}"><span class="story-inner">${avatar(p, "avatar-fill")}</span></span>
+    <span class="story-name">${esc((p.proName || p.name || "").split(" ")[0])}</span>
+    <span class="story-cat">${esc(o.tag || p.category || "")}</span></a>`;
+}
+/** Destaques da semana (top por cliques válidos) + Bancas novas (rotativas, só com produtos). */
+function homeBancas(listings, profiles) {
+  const hasProd = new Set(listings.map(l => l.ownerId)), ok = p => p.status !== "suspended";
+  const rk = rankedBancas(profiles).slice(0, CONFIG.DESTAQUE_TOP), inTop = new Set(rk.map(x => x.p.id));
+  const novas = hourShuffle(profiles.filter(p => ok(p) && hasProd.has(p.id) && !inTop.has(p.id) && Date.now() - toMillis(p.createdAt) < CONFIG.NOVAS_DAYS * DAY_MS)).slice(0, CONFIG.NOVAS_MAX);
+  let html = "";
+  if (rk.length) html += `<div class="section-head"><h2>Destaques da semana</h2></div>
+    <div id="destaques-strip">${rk.map((x, i) => storyCard(x.p, listings, { pos: i + 1, tag: "Destaque da semana", cls: "rank" })).join("")}</div>`;
+  if (novas.length) html += `<div class="section-head"><h2>Bancas novas</h2></div>
+    <div id="profiles-strip">${novas.map(p => storyCard(p, listings, { tag: "Nova" })).join("")}</div>`;
+  else {
+    const rest = hourShuffle(profiles.filter(p => ok(p) && hasProd.has(p.id) && !inTop.has(p.id))).slice(0, 12);
+    if (rest.length || !rk.length) html += `<div class="section-head"><h2>Bancas</h2></div>
+    <div id="profiles-strip">${rest.length ? rest.map(p => storyCard(p, listings)).join("") : `<p class="soft center">Ainda sem bancas. Sê o primeiro!</p>`}</div>`;
+  }
+  return html;
+}
 async function viewHome() {
   const [listings, profiles, count, mine] = await Promise.all([apiLoadListings(), apiLoadProfiles(), apiProfileCount(),
     (S.user && S.profile) ? apiLoadUserListings(S.user.uid).catch(() => []) : Promise.resolve([])]);
@@ -1989,17 +2168,9 @@ async function viewHome() {
       <p id="hero-sub">${esc(tx("hero1_s"))}</p>
       ${heroCta()}
     </div>
-    ${expiryBanner(mine)}
+    ${expiryBanner(mine, profiles)}
 
-    <div class="section-head"><h2>Perfis em destaque</h2></div>
-    <div id="profiles-strip">${profiles.length ? profiles.map(p => {
-      const ds = listings.filter(l => l.ownerId === p.id).map(daysLeft), ring = !ds.length ? "none" : (Math.min(...ds) <= 2 ? "soon" : "");
-      return `
-      <a class="story" href="#/p/${esc(p.slug)}">
-        <span class="story-ring ${ring}"><span class="story-inner">${avatar(p, "avatar-fill")}</span></span>
-        <span class="story-name">${esc((p.proName || p.name || "").split(" ")[0])}</span>
-        <span class="story-cat">${esc(p.category || "")}</span>
-      </a>`; }).join("") : `<p class="soft center">Ainda sem perfis. Seja o primeiro!</p>`}</div>
+    ${homeBancas(listings, profiles)}
 
     ${S.introGone ? "" : `<div id="intro-block">
     <div class="stats-grid">
@@ -2138,6 +2309,7 @@ async function viewProfile(slug) {
   }
   const isOwner = !!(S.user && p && p.id === S.user.uid);
   if (!p || (p.status === "suspended" && !isOwner && !S.isAdmin)) return notFoundBox();
+  if (slug && !isOwner) trackBanca(p.id, "v");                    // visita à banca
 
   const items = (await apiLoadUserListings(p.id)).filter(isActive);
   const prods = items.filter(l => l.kind === "product"), svcs = items.filter(l => l.kind === "service");
@@ -2190,7 +2362,7 @@ async function viewListing(id) {
   const wa = waLink(l.whatsapp, `Olá! Vi "${l.title}" no ${CONFIG.APP_NAME}.`);
   const url = listingUrl(l.id);
   const ownerProf = await apiLoadProfile(l.ownerId).catch(() => null);
-  const expired = toMillis(l.expiresAt) <= Date.now();
+  const expired = !CONFIG.PAUSE_EXPIRY && toMillis(l.expiresAt) <= Date.now();
   const gal = imgs.length
     ? `<div class="gal-wrap d" data-like="${esc(l.id)}"><div class="gal" id="gal-main" data-n="${imgs.length}">${imgs.map((u, i) => `<div class="gal-slide" data-lb="g" data-lbd="1" data-full="${esc(img((l.images || [])[i], 1600) || u)}"><img src="${esc(u)}" alt="${esc(l.title)}" ${i ? 'loading="lazy"' : ""} draggable="false"></div>`).join("")}</div>${imgs.length > 1 ? `<span class="gal-count">1/${imgs.length}</span>` : ""}</div>
        ${imgs.length > 1 ? `<div class="detail-thumbs">${(l.images || []).map((u, i) => `<img class="${i ? "" : "on"}" src="${esc(img(u, 160))}" alt="" data-act="gal-go" data-i="${i}" loading="lazy">`).join("")}</div>` : ""}`
@@ -2202,7 +2374,7 @@ async function viewListing(id) {
     <div class="row-gap">
       <span class="chip-cat">${esc(l.kind === "service" ? "Serviço" : "Produto")} · ${esc(l.category || "")}${l.categoryCustom ? " · " + esc(l.categoryCustom) : ""}</span>
       ${isNew(l) ? `<span class="badge-new">Novo</span>` : ""}
-      ${expired ? `<span class="badge-expiry urgent">Expirada</span>` : l.status !== "active" ? `<span class="badge-expiry urgent">Suspensa</span>` : `<span class="badge-expiry ${leftCls(daysLeft(l))}">Faltam ${daysLeft(l)} dias</span>`}
+      ${expired ? `<span class="badge-expiry urgent">Expirada</span>` : l.status !== "active" ? `<span class="badge-expiry urgent">Suspensa</span>` : CONFIG.PAUSE_EXPIRY ? "" : `<span class="badge-expiry ${leftCls(daysLeft(l))}">Faltam ${daysLeft(l)} dias</span>`}
     </div>
     <h1 class="h1" style="margin:8px 0 4px">${esc(l.title)}</h1>
     <div class="price lg">${esc(formatPrice(l.price))}</div>
@@ -2220,19 +2392,39 @@ async function viewListing(id) {
     ${owner || S.isAdmin ? `<div class="owner-bar">
       ${owner ? `<a class="btn btn-primary btn-sm" href="#/publicar?kind=${esc(l.kind)}">${ic("plus", 16)} Outro artigo</a>
       <a class="btn btn-outline btn-sm" href="#/editar/${esc(l.id)}">${ic("edit", 16)} Editar</a>
-      <button class="btn btn-outline btn-sm" data-act="renew" data-id="${esc(l.id)}">${ic("refresh", 16)} Renovar ${CONFIG.EXPIRY_DAYS}d</button>` : ""}
+      <button class="btn btn-outline btn-sm" data-act="renew" data-id="${esc(l.id)}">${ic("refresh", 16)} ${CONFIG.PAUSE_EXPIRY ? "Subir para o topo" : "Renovar " + CONFIG.EXPIRY_DAYS + "d"}</button>` : ""}
       <button class="btn btn-danger btn-sm" data-act="delete" data-id="${esc(l.id)}">${ic("trash", 16)} Eliminar</button></div>` : ""}
   </div>`;
 }
 
 // ══════════ MINHAS PUBLICAÇÕES ══════════
+/** Cartão «A tua banca»: cliques, visitas, posição e produtos mais procurados. */
+function bancaCard(p, profiles, items) {
+  const st = dayStats(p), pos = rankedBancas(profiles).findIndex(x => x.p.id === p.id) + 1, miss = Math.max(0, CONFIG.DESTAQUE_MIN_CLICKS - st.c7);
+  const cell = (v, l) => `<div class="bc-cell"><b>${v}</b><small>${l}</small></div>`;
+  const rankLine = pos && pos <= CONFIG.DESTAQUE_TOP ? `Estás em <b>${pos}.º</b> nos Destaques desta semana.`
+    : pos ? `Estás em ${pos}.º. Os Destaques são os ${CONFIG.DESTAQUE_TOP} primeiros.`
+    : `${miss === 1 ? "Falta 1 clique" : "Faltam " + miss + " cliques"} para entrares nos Destaques.`;
+  const score = l => (l.waClicks || 0) * 3 + (l.likeCount || 0) + (l.viewCount || 0) / 10;
+  const top = items.filter(l => isActive(l) && ((l.waClicks || 0) + (l.likeCount || 0) + (l.viewCount || 0)) > 0).sort((a, b) => score(b) - score(a)).slice(0, 3);
+  return `<div class="bc-card">
+    <h2 class="bc-t">A tua banca</h2>
+    <div class="bc-lab">Cliques no WhatsApp</div><div class="bc-grid">${cell(st.cToday, "hoje")}${cell(st.c7, "7 dias")}${cell(st.cTotal, "total")}</div>
+    <div class="bc-lab">Visitas à banca</div><div class="bc-grid">${cell(st.vToday, "hoje")}${cell(st.v7, "7 dias")}${cell(st.vTotal, "total")}</div>
+    <p class="bc-rank">${rankLine}</p>
+    ${top.length ? `<div class="bc-lab">Produtos mais procurados</div>${top.map(l => `<a class="bc-prod" href="#/a/${esc(l.id)}"><span>${esc(l.title)}</span><small>${l.waClicks || 0} contactos · ${l.likeCount || 0} gostos · ${l.viewCount || 0} visualizações</small></a>`).join("")}` : ""}
+    <button type="button" class="btn btn-wa btn-full" style="margin-top:12px" data-act="share-my">${WA_SVG} Partilhar a minha banca</button>
+    <p class="note">${esc(tx("coach_social"))}</p>
+  </div>`;
+}
 async function viewMine() {
   if (!requireProfile("#/minhas")) return null;
   const items = await apiLoadUserListings(S.user.uid);
+  const profiles = await apiLoadProfiles().catch(() => []), me = profiles.find(x => x.id === S.user.uid) || S.profile;
   const row = l => {
-    const exp = toMillis(l.expiresAt) <= Date.now();
+    const exp = !CONFIG.PAUSE_EXPIRY && toMillis(l.expiresAt) <= Date.now();
     const state = l.status !== "active" ? `<span class="badge-expiry urgent">Suspensa</span>`
-      : exp ? `<span class="badge-expiry urgent">Expirada</span>` : badge(l, "left");
+      : exp ? `<span class="badge-expiry urgent">Expirada</span>` : ownBadge(l);
     return `<div class="admin-list-item">
       <a class="grow" href="#/a/${esc(l.id)}"><div class="li-t">${esc(l.title)}</div>
         <div class="li-s">${l.kind === "service" ? "Serviço" : "Produto"} · ${esc(l.category || "")} · ${esc(formatPrice(l.price))}</div>
@@ -2247,9 +2439,10 @@ async function viewMine() {
   if (db && S.profile && S.profile.province)            // acrescenta (só uma vez) a província às publicações antigas
     items.filter(l => !l.province).forEach(l => { updateDoc(doc(db, "listings", l.id), { province: S.profile.province }).then(() => { l.province = S.profile.province; S.cache.listings = null; }).catch(() => {}); });
   return `<div class="container pad narrow">
-    ${expiryBanner(items)}
+    ${expiryBanner(items, profiles)}
+    ${bancaCard(me, profiles, items)}
     <div class="section-head"><h1 class="h1 sm">Minhas publicações</h1><a class="btn btn-primary btn-sm" href="#/publicar">+ Nova</a></div>
-    <p class="soft" style="margin-bottom:12px">${activeCount} activas. Cada uma dura ${CONFIG.EXPIRY_DAYS} dias; podes renovar.</p>
+    <p class="soft" style="margin-bottom:12px">${CONFIG.PAUSE_EXPIRY ? activeCount + " activas. Passados " + CONFIG.EXPIRY_DAYS + " dias, publica de novo para subires ao topo." : activeCount + " activas. Cada uma dura " + CONFIG.EXPIRY_DAYS + " dias; podes renovar."}</p>
     ${items.length ? items.map(row).join("") : emptyBox("Ainda não publicaste nada", "", `<a class="btn btn-primary btn-sm" href="#/publicar">Publicar agora</a>`)}
   </div>`;
 }
@@ -2292,6 +2485,8 @@ async function shareLink(url, title) {
   catch (e) { prompt("Copia o link:", url); }
 }
 ACTIONS.share = el => shareLink(el.dataset.url, el.dataset.title);
+ACTIONS["share-my"] = () => shareMyBanca();
+ACTIONS["coach-x"] = el => { try { sessionStorage.setItem("nlh_coach_x", "1"); } catch (e) {} const b = el.closest(".exp-banner"); if (b) b.remove(); };
 function shareMyBanca() { if (!S.profile) return; shareLink(profileUrl(S.profile.slug), (S.profile.proName || S.profile.name) + " — " + CONFIG.APP_NAME); }
 ACTIONS["prov-filter"] = el => {
   const q = new URLSearchParams((location.hash.split("?")[1]) || "");
@@ -2360,7 +2555,7 @@ async function viewNotifications() {
 
 ACTIONS.renew = async el => {
   await apiRenewListing(el.dataset.id);
-  toast(`Renovada por mais ${CONFIG.EXPIRY_DAYS} dias!`); render();
+  toast(CONFIG.PAUSE_EXPIRY ? "Subiu para o topo!" : `Renovada por mais ${CONFIG.EXPIRY_DAYS} dias!`); render();
 };
 ACTIONS.delete = async el => {
   if (!confirm("Eliminar esta publicação? Não dá para desfazer.")) return;
@@ -2492,10 +2687,10 @@ function resetPhotos(existing) {
   PH.existing = { avatar: "", cover: "", photos: [], ...(existing || {}) };
 }
 function photoTiles(slot) {
-  const tile = (src, k) => `<div class="pv"><img src="${esc(src)}" alt="">${k === null ? "" : `<button type="button" class="pv-x" data-act="photo-rm" data-slot="${slot}" data-i="${k}" aria-label="Remover foto">×</button>`}</div>`;
+  const tile = (src, k, weak) => `<div class="pv${weak ? " weak" : ""}"><img src="${esc(src)}" alt="">${weak ? `<span class="pv-warn">Fraca</span>` : ""}${k === null ? "" : `<button type="button" class="pv-x" data-act="photo-rm" data-slot="${slot}" data-i="${k}" aria-label="Remover foto">×</button>`}</div>`;
   let html = "";
   if (slot === "photos") {
-    html = PH.photos.length ? PH.photos.map((p, i) => tile(p.url, i)).join("")
+    html = PH.photos.length ? PH.photos.map((p, i) => tile(p.url, i, p.weak)).join("")
          : PH.existing.photos.map(u => tile(img(u, 200), null)).join("");
   } else if (PH[slot]) html = tile(PH[slot].url, 0);
   else if (PH.existing[slot]) html = tile(img(PH.existing[slot], 200), null);
@@ -2608,15 +2803,19 @@ ACTIONS["pick-photo"] = async el => {
   const room = multi ? CONFIG.MAX_IMAGES - PH.photos.length : 1;
   if (room <= 0) { toast("Esta publicação já está bem recheada de fotos! Para mostrar mais, cria outra publicação.", 4500); return; }
   if (files.length > room) toast("Juntei as primeiras fotos. As restantes ficam para outra publicação.", 4500);
+  let weakKind = "";
   for (const f of files.slice(0, room)) {
     PH.busy++; PH.busySlot = slot; paintPhotos(slot);
     try {
-      const blob = await compressImage(f), item = { blob, url: URL.createObjectURL(blob) };
+      const blob = await compressImage(f), item = { blob, url: URL.createObjectURL(blob), weak: multi ? (blob.weak || "") : "" };
+      if (item.weak && !weakKind) weakKind = item.weak;
+      if (photoDebug()) toast(`Nitidez ${blob.sharp}${blob.cropped ? " · barras cortadas" : ""}${blob.weak ? " · " + blob.weak : ""}`, 3500);
       if (multi) PH.photos.push(item);
       else { if (PH[slot]) URL.revokeObjectURL(PH[slot].url); PH[slot] = item; }
     } catch (e) { toast(friendlyError(e), 5000); }
     PH.busy--; paintPhotos(slot);
   }
+  if (weakKind) toast(weakKind === "small" ? "Esta foto é pequena e pode ficar sem nitidez. Se puderes, usa uma maior." : "Esta foto parece desfocada. Tira outra com mais luz, se puderes.", 6000);
 };
 ACTIONS["photo-rm"] = el => {
   const slot = el.dataset.slot, i = Number(el.dataset.i);
@@ -2708,7 +2907,7 @@ async function viewListingForm(id, kindParam) {
         <div id="pv-photos" class="previews pv-grid">${photoTiles("photos")}</div>
         <p class="note">Podes escolher várias de uma vez e adicionar mais depois. Toca no × para tirar uma.</p></div>`
         : `<p class="note">Fotos desligadas até configurares o Cloudinary (ver guia). Podes publicar sem foto.</p>`}
-      <div class="warn-note">Fica activa por <b>${CONFIG.EXPIRY_DAYS} dias</b> e depois expira. Podes renovar quando quiseres.</div>
+      ${CONFIG.PAUSE_EXPIRY ? `<div class="warn-note">Passados <b>${CONFIG.EXPIRY_DAYS} dias</b>, volta a publicar para subires ao topo.</div>` : `<div class="warn-note">Fica activa por <b>${CONFIG.EXPIRY_DAYS} dias</b> e depois expira. Podes renovar quando quiseres.</div>`}
       <button class="btn btn-primary btn-full" style="padding:14px" type="submit">${l ? "Guardar alterações" : "Publicar"}</button>
     </form></div>`;
 }
@@ -2757,6 +2956,7 @@ FORMS.listing = async f => {
   }
 
   const data = { title, ...resolveCategory(fd, kind), price, description, location: val(fd, "location"), whatsapp, province: S.profile.province || "" };
+  if (PH.photos.length) data.weak = PH.photos.some(p => p.weak);   // foto fraca: a faixa amarela lembra o vendedor
   if (id) {
     if (images) data.images = images;
     await apiUpdateListing(id, data);
@@ -2766,7 +2966,7 @@ FORMS.listing = async f => {
     if (mine.filter(isActive).length >= CONFIG.MAX_PUBLICATIONS_PER_USER)
       throw { userMessage: "A tua loja está cheia por agora. Elimina uma publicação antiga e tenta de novo." };
     const newId = await apiCreateListing({ ...data, kind, images: images || [] });
-    resetPhotos(); toast(`Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + newId);
+    resetPhotos(); toast(CONFIG.PAUSE_EXPIRY ? "Publicado!" : `Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + newId);
     setTimeout(() => showModal(tx("pub_t"), tx("pub_b"),
       [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Outro produto", fn: () => go("#/publicar?kind=" + kind) }]), 700);
   }
@@ -2777,7 +2977,7 @@ FORMS.listing = async f => {
 // Cada foto é um artigo (nome + preço). Fotos do mesmo artigo juntam-se ao de cima.
 // O resto (categoria, descrição, localização, WhatsApp) já vem do perfil e fica em "Mais detalhes".
 const BT = { items: [], busy: 0, kind: "product", left: 0 };
-function resetBatch() { BT.items.forEach(i => URL.revokeObjectURL(i.url)); BT.items = []; BT.busy = 0; BT.kind = "product"; }
+function resetBatch() { BT.items.forEach(i => URL.revokeObjectURL(i.url)); BT.items = []; BT.busy = 0; BT.weakToast = 0; BT.kind = "product"; }
 const btGroups = () => { const g = []; BT.items.forEach((it, i) => { if (it.join && g.length) g[g.length - 1].extra.push(i); else g.push({ lead: i, extra: [] }); }); return g; };
 const btCats = kind => (kind === "service" ? CONFIG.CATEGORIES_SERVICES : CONFIG.CATEGORIES_PRODUCTS).filter(c => c !== "Outro");
 async function viewBatchForm(kindParam) {
@@ -2812,7 +3012,7 @@ async function viewBatchForm(kindParam) {
         <div class="fld"><label class="field-label">WhatsApp de contacto *</label>
           <div class="phone-box"><span>+${CONFIG.COUNTRY_CODE}</span><input name="whatsapp" type="tel" inputmode="tel" maxlength="15" value="${esc(S.profile.phone || "")}"></div></div>
       </details>
-      <div class="warn-note">Ficam activos por <b>${CONFIG.EXPIRY_DAYS} dias</b>. Podes renovar quando quiseres.</div>
+      ${CONFIG.PAUSE_EXPIRY ? `<div class="warn-note">Passados <b>${CONFIG.EXPIRY_DAYS} dias</b>, volta a publicar para subires ao topo.</div>` : `<div class="warn-note">Ficam activos por <b>${CONFIG.EXPIRY_DAYS} dias</b>. Podes renovar quando quiseres.</div>`}
       <button id="bt-submit" class="btn btn-primary btn-full" style="padding:14px" type="submit" disabled>Publicar</button>
     </form></div>`;
 }
@@ -2857,7 +3057,7 @@ ACTIONS["bt-pick"] = async el => {
   if (files.length > room) toast("Juntei as primeiras fotos. As restantes ficam para a próxima vez.", 4500);
   for (const f of files.slice(0, room)) {
     BT.busy++; paintBatch();
-    try { const blob = await compressImage(f); BT.items.push({ blob, url: URL.createObjectURL(blob), title: "", price: "", cat: "", desc: "", open: false, join: false }); }
+    try { const blob = await compressImage(f); BT.items.push({ blob, url: URL.createObjectURL(blob), weak: blob.weak || "", title: "", price: "", cat: "", desc: "", open: false, join: false }); if (blob.weak && !BT.weakToast) { BT.weakToast = 1; toast("Alguma foto parece fraca (desfocada ou pequena). Se puderes, tira outra com mais luz.", 6000); } }
     catch (e) { toast(friendlyError(e), 5000); }
     BT.busy--; paintBatch();
   }
@@ -2908,7 +3108,7 @@ FORMS.batch = async f => {
         while (todo.length) { const k = todo.shift(); images[k] = await apiUploadBlob(BT.items[idx[k]].blob); }
       }));
       const id = await apiCreateListing({ title: String(it.title).trim(), category: it.cat || defCat, categoryCustom: "", price: it.price === "" ? null : Number(it.price),
-        description: String(it.desc || "").trim() || shared, location: val(fd, "location"), whatsapp, province: S.profile.province || "", kind, images });
+        description: String(it.desc || "").trim() || shared, location: val(fd, "location"), whatsapp, province: S.profile.province || "", kind, images, weak: idx.some(k => BT.items[k].weak) });
       ids.push(id); published.push(...idx);
     }
   } catch (e) {
@@ -2920,7 +3120,7 @@ FORMS.batch = async f => {
   }
   resetBatch(); S.cache.listings = null;
   if (ids.length === 1) {
-    toast(`Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + ids[0]);
+    toast(CONFIG.PAUSE_EXPIRY ? "Publicado!" : `Publicado! Activo por ${CONFIG.EXPIRY_DAYS} dias.`); go("#/a/" + ids[0]);
     setTimeout(() => showModal(tx("pub_t"), tx("pub_b"),
       [{ label: "Partilhar", primary: true, fn: shareMyBanca }, { label: "Outro produto", fn: () => go("#/publicar?kind=" + kind) }]), 700);
   } else {
@@ -2946,16 +3146,16 @@ async function waitBatch() {
 const remDay = () => { const d = new Date(); return `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}`; };
 const remKey = r => `nlh_rem_${r.p.id}_${r.kind}_${remDay()}`;
 const remDone = r => { try { return !!localStorage.getItem(remKey(r)); } catch (e) { return false; } };
-function remFill(tpl, v) { return String(tpl).replace(/\{(nome|produto|quando|link)\}/g, (m, k) => v[k] == null ? m : v[k]); }
+function remFill(tpl, v) { return String(tpl).replace(/\{(nome|produto|quando|link|dias)\}/g, (m, k) => v[k] == null ? m : v[k]); }
 function remindMsg(r) {
   const first = String(r.p.proName || r.p.name || "").split(" ")[0], link = profileUrl(r.p.slug);
-  const kind = r.kind === "expiring" ? "lemb_expiring" : r.kind === "expired" ? "lemb_expired" : "lemb_nopub";
+  const kind = r.kind === "stale" ? "lemb_stale" : r.kind === "expiring" ? "lemb_expiring" : r.kind === "expired" ? "lemb_expired" : "lemb_nopub";
   const quando = r.days <= 1 ? "amanhã" : "daqui a 2 dias";
   const produto = r.kind === "expiring" ? (r.count > 1 ? `${r.titles[0]} e mais ${r.count - 1}` : r.titles[0]) : "";
   const note = notesLoad().find(x => x.k === kind), def = NOTES_DEFAULT.find(x => x[2] === kind);
-  return remFill((note && note.b) || def[1], { nome: first, produto, quando, link });
+  return remFill((note && note.b) || def[1], { nome: first, produto, quando, link, dias: r.days });
 }
-const REM_LABEL = { expiring: r => r.days <= 1 ? "Termina amanhã" : "Termina em 2 dias", expired: () => "Já terminou", nopub: () => "Ainda não publicou" };
+const REM_LABEL = { stale: r => `${r.days} dias sem publicar`, expiring: r => r.days <= 1 ? "Termina amanhã" : "Termina em 2 dias", expired: () => "Já terminou", nopub: () => "Ainda não publicou" };
 let _remList = [];
 ACTIONS["admin-remind"] = () => adminOut(remindSection(_remList));
 function remindSection(list) {
@@ -3003,7 +3203,8 @@ async function viewAdmin() {
       ${btn("admin-notes", "edit", "Notas e mensagens", "As tuas mensagens prontas a copiar")}
       ${btn("admin-users", "user", "Listar utilizadores", "Ver perfis e suspender")}
       ${btn("admin-listings", "list", "Listar publicações", "Suspender ou eliminar")}
-      ${btn("admin-purge", "trash", "Eliminar expiradas", "Limpar já (o Firebase também limpa sozinho)")}
+      ${btn("admin-reactivate", "refresh", CONFIG.PAUSE_EXPIRY ? "Reativar todas as publicações" : "Reiniciar prazos (7 dias)", CONFIG.PAUSE_EXPIRY ? "Põe no ar as que estavam inactivas e tira o prazo" : "Dá mais 7 dias a todas")}
+      ${CONFIG.PAUSE_EXPIRY ? "" : btn("admin-purge", "trash", "Eliminar expiradas", "Limpar já (o Firebase também limpa sozinho)")}
     </div>
     <p class="note">As categorias editam-se em <b>01-config.js</b> (editor no painel fica para a fase 2).</p>
     <div id="admin-out"></div></div>`;
@@ -3021,6 +3222,7 @@ const NOTES_DEFAULT = [
   ["Lembrete: termina em breve", "Olá {nome}! O teu produto \"{produto}\" sai da banca {quando}. Entra e toca em *Renovar*: voltas para o topo e mais gente vê.\n\n*Partilha o teu link nos teus estados para mais gente ver.*\n{link}", "lemb_expiring"],
   ["Lembrete: já terminou", "Olá {nome}! A tua banca ficou sem produtos. Toca em *Renovar* e voltas para o topo, ou põe produtos novos (podes pôr vários de uma vez).\n\n*Partilha o teu link nos teus estados para mais gente ver.*\n{link}", "lemb_expired"],
   ["Lembrete: ainda não publicou", "Olá {nome}! A tua banca no N Deals ainda está vazia. Põe o primeiro produto: só a foto e o preço. Se precisares de ajuda, diz-me que eu ajudo.\n\n*Depois partilha o teu link nos teus estados para mais gente ver.*\n{link}", "lemb_nopub"],
+  ["Lembrete: publica mais", "Olá {nome}! Já passaram {dias} dias desde a tua última publicação. Publica mais produtos para voltares ao topo e mais gente ver.\n\n*Partilha o teu link nos teus estados para mais gente ver.*\n{link}", "lemb_stale"],
   ["Explicação da banca", "A tua banca é o teu cantinho no N Deals: pões a foto e o preço dos produtos e ficas com um link só teu. Continuas no teu WhatsApp. Aqui só arrumas.", "banca_expl"],
   ["Cloudflare Worker", "Endereço: https://fancy-bar-4909.rdrgsmnjt.workers.dev\nVer a imagem de uma publicação: /a/CÓDIGO?debug=1\nSe o cartão não atualizar no WhatsApp, acrescentar ?v=3 ao link.\nCódigo: o ficheiro worker.js (Editar código, apagar tudo, colar, Implementar)."]
 ];
@@ -3036,7 +3238,7 @@ function notesPaint() {
   adminOut(`<h2 class="h2">Notas e mensagens</h2><p class="note">Ficam guardadas neste telemóvel. Toca em Copiar e cola no WhatsApp. As notas «Lembrete» são as mensagens que o painel envia.</p>
     ${n.map((x, i) => `<div class="card pad-card note-card"><input class="field-input note-t" data-i="${i}" data-oninput="note-edit" data-f="t" value="${esc(x.t)}" maxlength="60">
       <textarea class="field-input" rows="4" data-i="${i}" data-oninput="note-edit" data-f="b">${esc(x.b)}</textarea>
-      ${x.k && /^lemb_/.test(x.k) ? `<p class="note">Podes usar {nome}, {produto}, {quando} e {link}. Aparece no Lembrete de cada pessoa.</p>` : ""}
+      ${x.k && /^lemb_/.test(x.k) ? `<p class="note">Podes usar {nome}, {produto}, {quando}, {dias} e {link}. Aparece no Lembrete de cada pessoa.</p>` : ""}
       <div class="bt-acts"><button class="btn btn-wa btn-sm" data-act="note-copy" data-i="${i}">Copiar</button>${x.k ? `<button class="btn btn-ghost btn-sm" data-act="note-reset" data-i="${i}">Repor original</button>` : `<button class="btn btn-ghost btn-sm bt-del" data-act="note-del" data-i="${i}">${ic("trash", 14)} Apagar</button>`}</div></div>`).join("")}
     <button class="btn btn-outline btn-sm" data-act="note-add">+ Nova nota</button>`);
 }
@@ -3090,15 +3292,20 @@ ACTIONS["admin-listings"] = async () => {
   adminOut(SPINNER);
   const items = await apiAdminListings();
   adminOut(`<h2 class="h2">Publicações (${items.length})</h2>` + items.map(l => {
-    const exp = toMillis(l.expiresAt) <= Date.now();
+    const exp = !CONFIG.PAUSE_EXPIRY && toMillis(l.expiresAt) <= Date.now();
     return `<div class="admin-list-item"><a class="grow" href="#/a/${esc(l.id)}"><div class="li-t">${esc(l.title)}</div>
-      <div class="li-s">${esc(l.ownerName || "")} · ${exp ? "expirada" : daysLeft(l) + "d"}${l.status !== "active" ? " · SUSPENSA" : ""}</div></a>
+      <div class="li-s">${esc(l.ownerName || "")} · ${exp ? "expirada" : CONFIG.PAUSE_EXPIRY ? "sem prazo" : daysLeft(l) + "d"}${l.status !== "active" ? " · SUSPENSA" : ""}</div></a>
       <div class="li-actions">
         <button class="btn btn-sm btn-outline" data-act="admin-listing-status" data-id="${esc(l.id)}" data-status="${l.status === "active" ? "suspended" : "active"}">${l.status === "active" ? "Suspender" : "Reactivar"}</button>
         <button class="icon-btn sm danger" data-act="admin-listing-del" data-id="${esc(l.id)}" aria-label="Eliminar">${ic("trash", 16)}</button></div></div>`;
   }).join(""));
 };
 
+ACTIONS["admin-reactivate"] = async () => {
+  if (!confirm(CONFIG.PAUSE_EXPIRY ? "Reativar todas as publicações e tirar o prazo?" : "Dar mais " + CONFIG.EXPIRY_DAYS + " dias a todas as publicações?")) return;
+  try { const k = await apiAdminReactivateAll(); toast(`${k} publicação(ões) reativada(s).`); render(); }
+  catch (e) { toast("Não consegui reativar. Tenta de novo."); }
+};
 ACTIONS["admin-purge"] = async () => {
   if (!confirm("Eliminar todas as publicações expiradas?")) return;
   const n = await apiAdminDeleteExpired();
